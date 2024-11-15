@@ -22,6 +22,34 @@ in terminal, you can use the following commands to push your changes to the gith
 git commit -m "your comment here"
 ```
 
+note that you should create a branch for your work. You can create a branch using the following command:
+
 ```
-git push
+git checkout -b your-branch-name
 ```
+
+It will create a new branch and switch to it. You can now make changes to the project. Once you are done making changes, you can push your changes to the github repository using the following command:
+
+```
+git push origin your-branch-name
+```
+
+However, if it fails, probably because you are not up-to-date with the main branch, you can use the following command to pull the changes from the main branch to your branch:
+
+```
+git pull origin main
+```
+
+If you have any conflicts, you should resolve them before you can push your changes to the github repository. Once you have resolved the conflicts, you can push your changes to the github repository using the following command:
+
+```
+git push origin your-branch-name
+```
+
+After you checked that your changes are correct, you can create a pull request to merge your changes to the main branch. You can create a pull request by going to the github repository and clicking on the "New pull request" button. You can then select the branch that you want to merge and create a pull request. Once you have created a pull request, you can assign someone to review your changes and merge them to the main branch. Here is the code for the pull request:
+
+```
+git pull-request
+```
+
+This is a quick guide on how to use git to contribute to this project. If you have any questions, feel free to ask.
