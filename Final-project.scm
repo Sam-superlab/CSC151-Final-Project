@@ -37,16 +37,29 @@
 ;; Section 1: Helper functions for multimedia processing.
 
 
+(description "code stored in section1.scm")
+
+
+
 
 
 ;;------------------------------------------------------------------------------
 ;; Section 2: Core recursive and higher-order procedures.
 
-
+(description "code stored in section2.scm")
 
 
 ;;------------------------------------------------------------------------------
 ;;section 3: Program-specific utilities for creating art, music, or interactive elements.
+
+
+(description "code stored in section3.scm")
+
+;;------------------------------------------------------------------------------
+;;section 4: Main program logic, combining all components.
+
+(description "code stored in section4.scm")
+
 
 
 
