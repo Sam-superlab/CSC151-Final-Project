@@ -1,27 +1,52 @@
 # CSC151-Final-Project
 
-Authors: Sam Ren,
+Authors: Xuyi(Sam) Ren, Hassan, Jonathan Gaynor, Ari Johnson, Sam
 
 ## Project Description
 
-## How to contribute(use git)
+## How to contribute (using git)
 
-git is a version control system that allows multiple people to work on the same project. This is a quick guide on how to use git to contribute to this project.
+Git is a version control system that allows multiple people to work on the same project. This is a quick guide on how to use git to contribute to this project.
 
-Here are some commands that you can make changes and contribute to the project in your local machine:
+### Cloning the repository
 
+To get a copy of the project on your local machine, run:
 ```
 git clone https://github.com/Sam-superlab/CSC151-Final-Project
 ```
 
-after running this command, you will have a copy of the project on your local machine. You can now make changes to the project. you can use github desktop to make changes to the project. It is a GUI tool that makes it easier to make changes to the project. Note that you should always comment your work before you push it to the github repository.
+### Creating a branch
 
-in terminal, you can use the following commands to push your changes to the github repository:
+Before making changes, create a new branch:
+```
+git checkout -b your-branch-name
+```
 
+### Committing your changes
+
+After making changes, commit them with a comment:
 ```
 git commit -m "your comment here"
 ```
 
+### Pushing your changes
+
+Push your changes to the GitHub repository:
 ```
-git push
+git push origin your-branch-name
 ```
+
+If it fails, probably because you are not up-to-date with the main branch, pull the changes from the main branch:
+```
+git pull origin main
+```
+Resolve any conflicts, then push your changes again:
+```
+git push origin your-branch-name
+```
+
+### Creating a pull request
+
+Once your changes are pushed, create a pull request on GitHub by clicking the "New pull request" button. Select the branch you want to merge and create the pull request. Assign someone to review and merge your changes to the main branch.
+
+If you have any questions, feel free to ask.
