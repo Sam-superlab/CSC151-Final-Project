@@ -4,52 +4,49 @@ Authors: Xuyi(Sam) Ren, Hassan, Jonathan Gaynor, Ari Johnson, Sam
 
 ## Project Description
 
-## How to contribute(use git)
+## How to contribute (using git)
 
-git is a version control system that allows multiple people to work on the same project. This is a quick guide on how to use git to contribute to this project.
+Git is a version control system that allows multiple people to work on the same project. This is a quick guide on how to use git to contribute to this project.
 
-Here are some commands that you can make changes and contribute to the project in your local machine:
+### Cloning the repository
 
+To get a copy of the project on your local machine, run:
 ```
 git clone https://github.com/Sam-superlab/CSC151-Final-Project
 ```
 
-after running this command, you will have a copy of the project on your local machine. You can now make changes to the project. you can use github desktop to make changes to the project. It is a GUI tool that makes it easier to make changes to the project. Note that you should always comment your work before you push it to the github repository.
+### Creating a branch
 
-in terminal, you can use the following commands to push your changes to the github repository:
-
-```
-git commit -m "your comment here"
-```
-
-note that you should create a branch for your work. You can create a branch using the following command:
-
+Before making changes, create a new branch:
 ```
 git checkout -b your-branch-name
 ```
 
-It will create a new branch and switch to it. You can now make changes to the project. Once you are done making changes, you can push your changes to the github repository using the following command:
+### Committing your changes
 
+After making changes, commit them with a comment:
+```
+git commit -m "your comment here"
+```
+
+### Pushing your changes
+
+Push your changes to the GitHub repository:
 ```
 git push origin your-branch-name
 ```
 
-However, if it fails, probably because you are not up-to-date with the main branch, you can use the following command to pull the changes from the main branch to your branch:
-
+If it fails, probably because you are not up-to-date with the main branch, pull the changes from the main branch:
 ```
 git pull origin main
 ```
-
-If you have any conflicts, you should resolve them before you can push your changes to the github repository. Once you have resolved the conflicts, you can push your changes to the github repository using the following command:
-
+Resolve any conflicts, then push your changes again:
 ```
 git push origin your-branch-name
 ```
 
-After you checked that your changes are correct, you can create a pull request to merge your changes to the main branch. You can create a pull request by going to the github repository and clicking on the "New pull request" button. You can then select the branch that you want to merge and create a pull request. Once you have created a pull request, you can assign someone to review your changes and merge them to the main branch. Here is the code for the pull request:
+### Creating a pull request
 
-```
-git pull-request
-```
+Once your changes are pushed, create a pull request on GitHub by clicking the "New pull request" button. Select the branch you want to merge and create the pull request. Assign someone to review and merge your changes to the main branch.
 
-This is a quick guide on how to use git to contribute to this project. If you have any questions, feel free to ask.
+If you have any questions, feel free to ask.
