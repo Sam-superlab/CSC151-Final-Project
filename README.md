@@ -1,6 +1,6 @@
 # CSC151-Final-Project
 
-Authors: Sam Ren,
+Authors: Xuyi(Sam) Ren, Hassan, Jonathan Gaynor, Ari Johnson, Sam
 
 ## Project Description
 
