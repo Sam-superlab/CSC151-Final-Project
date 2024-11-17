@@ -112,7 +112,8 @@
            (above row1 row2 row3))]
         [else "Pattern must be exactly 9 characters long"]))))
 
-
+;; Functions create triangle fractals
+;; 
 
 
 
