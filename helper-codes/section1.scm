@@ -109,11 +109,5 @@
                 [row1 (beside (list-ref sub-images 0) (list-ref sub-images 1) (list-ref sub-images 2))]
                 [row2 (beside (list-ref sub-images 3) (list-ref sub-images 4) (list-ref sub-images 5))]
                 [row3 (beside (list-ref sub-images 6) (list-ref sub-images 7) (list-ref sub-images 8))])
-           (above row1 row2 row3))]
+          (above row1 row2 row3))]
         [else "Pattern must be exactly 9 characters long"]))))
-
-;; Functions create triangle fractals
-;; 
-
-
-
