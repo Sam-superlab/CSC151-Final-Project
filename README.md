@@ -26,9 +26,9 @@ We are planning to create a digital art where using scamper as our coding langua
 
 ## Code Storage
 Helper functions are in section1.scm
-Flowers: section2.scm
-Trees: section3.scm
-Testing: section4.scm
+Individual elements: section2.scm
+Interactivity for button: section3.scm
+Interactivity for showing plants: section4.scm
 Final code: Final-project.scm
 
 
