@@ -1,70 +1,55 @@
-;;section3.scm file interactivity helper functions
-;;This file contains helper functions for the interactivity section of the project
-
-
-(import image)
-(import lab)
 (import canvas)
-(import html)
+(import reactive)
 
-(define interaction-canvas (make-canvas 400 400))
+;; Define the state structure
+(struct state (
+  options-visible?  ; boolean, whether the options are displayed
+))
 
-;; Function to handle color change
-(define handle-color-change
-  (lambda ()
-    (begin
-      (canvas-rectangle! interaction-canvas 0 0 400 400 "solid" "lightblue"))))
+;; Canvas dimensions
+(define width 400)
+(define height 400)
 
-;; Function to handle size change
-(define handle-size-change
-  (lambda ()
-    (begin
-      (canvas-rectangle! interaction-canvas 0 0 400 400 "solid" "lightgray")
-      (canvas-circle! interaction-canvas 200 200 50 "solid" "green"))))
+;; Initial state
+(define initial-state (state #f))
 
-;; Function to handle string input
-(define handle-string-input
-  (lambda (input)
-    (begin
-      (canvas-rectangle! interaction-canvas 0 0 400 400 "solid" "white")
-      (canvas-text! interaction-canvas 50 200 input 30 "solid" "black" "20px Arial"))))
+;; View function to render the canvas based on the state
+(define view
+  (lambda (st canv)
+    (match st
+      [(state options-visible?)
+       (begin
+         ;; Clear the canvas
+         (canvas-rectangle! canv 0 0 width height "solid" "white")
+         ;; Main "Options" button
+         (canvas-rectangle! canv 150 50 100 50 "solid" "lightblue")
+         (canvas-text! canv 165 75 "options" 20 "solid" "black")
+         ;; Display additional buttons if options are visible
+         (if options-visible?
+             (begin
+               (canvas-rectangle! canv 150 150 100 50 "solid" "lightgreen")
+               (canvas-text! canv 180 175 "Color" 20 "solid" "black")
+               (canvas-rectangle! canv 150 220 100 50 "solid" "lightcoral")
+               (canvas-text! canv 180 245 "Size" 20 "solid" "black")
+               (canvas-rectangle! canv 150 290 100 50 "solid" "lightyellow")
+               (canvas-text! canv 175 315 "Pattern" 20 "solid" "black")) #f))])))
 
-;; State to track if options are displayed
-(define options-visible? (ref #f))
+;; Update function to handle events
+(define update
+  (lambda (msg st)
+    (match msg
+      [(event-mouse-click btn cx cy)
+       ;; Toggle options visibility if main button is clicked
+       (if (and (> cx 150) (< cx 250) (> cy 50) (< cy 100))
+           (state (not (state-options-visible? st)))
+           st)]
+      [else st])))
 
-;; Create buttons and input dynamically
-(define toggle-options
-  (lambda ()
-    (if (deref options-visible?)
-        (begin
-          (tag-set-children! options-container (list)) ; Hide options
-          (ref-set! options-visible? #f))
-        (begin
-          (tag-set-children!
-           options-container
-           (list
-            (button "Color"
-                    (lambda () (handle-color-change)))
-            (button "Size"
-                    (lambda () (handle-size-change)))
-            (tag "div"
-                 (list
-                  (text-area "string-input")
-                  (button "Submit"
-                          (lambda ()
-                            (let ([input (text-area-get (text-area "string-input"))])
-                              (handle-string-input input))))))))
-          (ref-set! options-visible? #t)))))
-
-(define options-container (tag "div"))
-
-(define main-button
-  (button "Options" (lambda () (toggle-options))))
-
-(display (tag "div"
-              (list
-               interaction-canvas
-               main-button
-               options-container)))
-
-(canvas-rectangle! interaction-canvas 0 0 400 400 "solid" "white"
+;; Reactive canvas with subscriptions
+(display
+ (reactive-canvas
+   width height
+   initial-state
+   view
+   update
+   (on-mouse-click)))
