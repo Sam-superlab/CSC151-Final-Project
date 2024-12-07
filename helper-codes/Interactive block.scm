@@ -1,147 +1,163 @@
 (import canvas)
 (import reactive)
 
-;; Define the state structure
 (struct state (
-  options-visible?         ; boolean, whether the main options are displayed
-  color-options-visible?   ; boolean, whether the color options are displayed
-  size-options-visible?    ; boolean, whether the size options are displayed
-  pattern-options-visible? ; boolean, whether the pattern options are displayed
+  options-visible?
+  plants-options-visible?
+  selected-plant
 ))
 
-;; Canvas dimensions
 (define width 400)
 (define height 400)
-(define current-size (ref 100))  ; Default size as a percentage
 
-;; Initial state
-(define initial-state (state #f #f #f #f))
+(define initial-state (state #f #f 'none))
 
-;; View function to render the canvas based on the state
+(define clear-canvas
+  (lambda (canv)
+    (begin
+      (canvas-rectangle! canv 0 0 width height "solid" "white"))))
+
+(define render-main-options-button
+  (lambda (canv)
+    (begin
+      (canvas-rectangle! canv 150 50 100 50 "solid" "lightblue")
+      (canvas-text! canv 165 75 "Options" 20 "solid" "black"))))
+
+(define render-main-options
+  (lambda (canv)
+    (begin
+      (canvas-rectangle! canv 150 150 100 50 "solid" "lightgreen")
+      (canvas-text! canv 180 175 "Plants" 20 "solid" "black")
+
+      (canvas-rectangle! canv 150 220 100 50 "solid" "lightcoral")
+      (canvas-text! canv 180 245 "Water" 20 "solid" "black"))))
+
+(define render-plant-options
+  (lambda (canv)
+    (begin
+      (canvas-rectangle! canv 50 150 100 50 "solid" "green")
+      (canvas-text! canv 85 175 "Rose" 20 "solid" "white")
+
+      (canvas-rectangle! canv 150 150 100 50 "solid" "green")
+      (canvas-text! canv 160 175 "Sunflower" 20 "solid" "white")
+
+      (canvas-rectangle! canv 250 150 100 50 "solid" "green")
+      (canvas-text! canv 280 175 "Daisy" 20 "solid" "white")
+
+      (canvas-rectangle! canv 50 220 100 50 "solid" "green")
+      (canvas-text! canv 85 245 "Tulip" 20 "solid" "white")
+
+      (canvas-rectangle! canv 150 220 100 50 "solid" "green")
+      (canvas-text! canv 165 245 "Lily" 20 "solid" "white")
+
+      (canvas-rectangle! canv 250 220 100 50 "solid" "green")
+      (canvas-text! canv 275 245 "Cactus" 20 "solid" "white"))))
+
+(define overlay-canvas
+  (let ([oc (make-canvas 50 50)])
+    (begin (canvas-rectangle! oc 0 0 50 50 "solid" "blue")
+    oc)))
+
+
+(define render-selected-plant
+  (lambda (canv selected-plant)
+    (if (equal? selected-plant 'none)
+        (void) ; No plant selected, do nothing
+        (canvas-rectangle! canv 180 300 50 50 "solid" "blue"))))
+
+
+
+
 (define view
   (lambda (st canv)
-    (match st
-      [(state options-visible? color-options-visible? size-options-visible? pattern-options-visible?)
-       (begin
-         ;; Clear the canvas
-         (canvas-rectangle! canv 0 0 width height "solid" "white")
-         ;; Main "Options" button
-         (canvas-rectangle! canv 150 50 100 50 "solid" "lightblue")
-         (canvas-text! canv 165 75 "Options" 20 "solid" "black")
-         
-         ;; Render based on visibility
-         (cond
-           ;; Case: Color options are visible
-           [color-options-visible?
-            (begin
-              (canvas-rectangle! canv 50 150 100 50 "solid" "red")
-              (canvas-text! canv 85 175 "Red" 20 "solid" "white")
-              (canvas-rectangle! canv 150 150 100 50 "solid" "green")
-              (canvas-text! canv 180 175 "Green" 20 "solid" "white")
-              (canvas-rectangle! canv 250 150 100 50 "solid" "blue")
-              (canvas-text! canv 280 175 "Blue" 20 "solid" "white"))]
+    (begin
+      (match st
+        [(state options-visible? plants-options-visible? selected-plant)
+         (begin
+           (clear-canvas canv)
+           (render-main-options-button canv)
+           (cond
+             [plants-options-visible? (render-plant-options canv)]
+             [options-visible? (render-main-options canv)]
+             [else #f])
+           (render-selected-plant canv selected-plant))]))))
 
-           ;; Case: Size options are visible
-           [size-options-visible?
-            (begin
-              (canvas-rectangle! canv 50 150 100 50 "solid" "lightgray")
-              (canvas-text! canv 70 175 "50%" 20 "solid" "black")
-              (canvas-rectangle! canv 150 150 100 50 "solid" "lightgray")
-              (canvas-text! canv 165 175 "100%" 20 "solid" "black")
-              (canvas-rectangle! canv 250 150 100 50 "solid" "lightgray")
-              (canvas-text! canv 265 175 "150%" 20 "solid" "black"))]
+(define main-options-clicked?
+  (lambda (cx cy)
+    (begin
+      (and (> cx 150) (< cx 250) (> cy 50) (< cy 100)))))
 
-           ;; Case: Pattern options are visible
-           [pattern-options-visible?
-            (begin
-              (canvas-rectangle! canv 50 150 100 50 "solid" "lightyellow")
-              (canvas-text! canv 85 175 "n=3" 20 "solid" "black")
-              (canvas-rectangle! canv 150 150 100 50 "solid" "lightyellow")
-              (canvas-text! canv 180 175 "n=4" 20 "solid" "black")
-              (canvas-rectangle! canv 250 150 100 50 "solid" "lightyellow")
-              (canvas-text! canv 280 175 "n=5" 20 "solid" "black"))]
+(define plants-button-clicked?
+  (lambda (cx cy st)
+    (begin
+      (and (state-options-visible? st) (> cx 150) (< cx 250) (> cy 150) (< cy 200)))))
 
-           ;; Case: Main options are visible
-           [options-visible?
-            (begin
-              (canvas-rectangle! canv 150 150 100 50 "solid" "lightgreen")
-              (canvas-text! canv 180 175 "Color" 20 "solid" "black")
-              (canvas-rectangle! canv 150 220 100 50 "solid" "lightcoral")
-              (canvas-text! canv 180 245 "Size" 20 "solid" "black")
-              (canvas-rectangle! canv 150 290 100 50 "solid" "lightyellow")
-              (canvas-text! canv 175 315 "Pattern" 20 "solid" "black"))]
+(define water-button-clicked?
+  (lambda (cx cy st)
+    (begin
+      (and (state-options-visible? st) (> cx 150) (< cx 250) (> cy 220) (< cy 270)))))
 
-           ;; Default case: Do nothing
-           [else #f]))])))
+(define plant-clicked?
+  (lambda (cx cy plant)
+    (begin
+      (cond
+        [(equal? plant 'rose)
+         (and (> cx 50) (< cx 150) (> cy 150) (< cy 200))]
+        [(equal? plant 'sunflower)
+         (and (> cx 150) (< cx 250) (> cy 150) (< cy 200))]
+        [(equal? plant 'daisy)
+         (and (> cx 250) (< cx 350) (> cy 150) (< cy 200))]
+        [(equal? plant 'tulip)
+         (and (> cx 50) (< cx 150) (> cy 220) (< cy 270))]
+        [(equal? plant 'lily)
+         (and (> cx 150) (< cx 250) (> cy 220) (< cy 270))]
+        [(equal? plant 'cactus)
+         (and (> cx 250) (< cx 350) (> cy 220) (< cy 270))]
+        [else #f]))))
 
-;; Update function to handle events
 (define update
   (lambda (msg st)
-    (match msg
-      [(event-mouse-click _ cx cy)
-       (cond
-         ;; Main "Options" button
-         [(and (> cx 150) (< cx 250) (> cy 50) (< cy 100))
-          (state (not (state-options-visible? st)) #f #f #f)]
-         
-         ;; "Color" button
-         [(and (> cx 150) (< cx 250) (> cy 150) (< cy 200) (state-options-visible? st))
-          (state #t #t #f #f)]
+    (begin
+      (match msg
+        [(event-mouse-click _ cx cy)
+         (begin
+           (cond
+             [(main-options-clicked? cx cy) (toggle-main-options st)]
+             [(plants-button-clicked? cx cy st) (show-plants-options st)]
+             [(water-button-clicked? cx cy st) (start-water-animation st)]
+             [(plant-clicked? cx cy 'rose) (select-plant st 'rose)]
+             [(plant-clicked? cx cy 'sunflower) (select-plant st 'sunflower)]
+             [(plant-clicked? cx cy 'daisy) (select-plant st 'daisy)]
+             [(plant-clicked? cx cy 'tulip) (select-plant st 'tulip)]
+             [(plant-clicked? cx cy 'lily) (select-plant st 'lily)]
+             [(plant-clicked? cx cy 'cactus) (select-plant st 'cactus)]
+             [else st]))]
+        [else st]))))
 
-         ;; "Size" button
-         [(and (> cx 150) (< cx 250) (> cy 220) (< cy 270) (state-options-visible? st))
-          (state #t #f #t #f)]
+(define toggle-main-options
+  (lambda (st)
+    (begin
+      (state (not (state-options-visible? st)) #f 'none))))
 
-         ;; "Pattern" button
-         [(and (> cx 150) (< cx 250) (> cy 290) (< cy 340) (state-options-visible? st))
-          (state #t #f #f #t)]
+(define show-plants-options
+  (lambda (st)
+    (begin
+      (state #t #t (state-selected-plant st)))))
 
-         ;; "Red" option
-         [(and (> cx 50) (< cx 150) (> cy 150) (< cy 200) (state-color-options-visible? st))
-          (begin
-            (canvas-rectangle! canv 0 0 width height "solid" "red")
-            (state #t #f #f #f))]
-         
-         ;; "Green" option
-         [(and (> cx 150) (< cx 250) (> cy 150) (< cy 200) (state-color-options-visible? st))
-          (begin
-            (canvas-rectangle! canv 0 0 width height "solid" "green")
-            (state #t #f #f #f))]
+(define start-water-animation
+  (lambda (st)
+    (begin
+      ;; Animation logic placeholder
+      st)))
 
-         ;; "Blue" option
-         [(and (> cx 250) (< cx 350) (> cy 150) (< cy 200) (state-color-options-visible? st))
-          (begin
-            (canvas-rectangle! canv 0 0 width height "solid" "blue")
-            (state #t #f #f #f))]
+(define select-plant
+  (lambda (st plant)
+    (begin
+      (state #t #f plant))))
 
-         ;; "50%" option
-         [(and (> cx 50) (< cx 150) (> cy 150) (< cy 200) (state-size-options-visible? st))
-          (begin
-            (ref-set! current-size 50)
-            (state #t #f #f #f))]
-
-         ;; "100%" option
-         [(and (> cx 150) (< cx 250) (> cy 150) (< cy 200) (state-size-options-visible? st))
-          (begin
-            (ref-set! current-size 100)
-            (state #t #f #f #f))]
-
-         ;; "150%" option
-         [(and (> cx 250) (< cx 350) (> cy 150) (< cy 200) (state-size-options-visible? st))
-          (begin
-            (ref-set! current-size 150)
-            (state #t #f #f #f))]
-
-         ;; Default: Return current state
-         [else st])]
-      ;; Default: Return current state
-      [else st])))
-
-;; Reactive canvas with subscriptions
-(display
- (reactive-canvas
-   width height
-   initial-state
-   view
-   update
-   (on-mouse-click)))
+(reactive-canvas
+ width height
+ initial-state
+ view
+ update
+ (on-mouse-click))
