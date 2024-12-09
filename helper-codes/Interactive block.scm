@@ -581,6 +581,46 @@
       (canvas-rectangle! canv 0 390 100 50 "solid" "green")
       (canvas-text! canv 10 415 "Bamboo" 20 "solid" "white"))))
 
+;;; (render-main-options canv) -> void
+;;;    canv : canvas?
+;;; Renders the main options on the canvas.
+(define render-main-options
+  (lambda (canv)
+    (begin
+      (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
+      (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
+      (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
+      (canvas-text! canv 130 245 "Water" 20 "solid" "black"))))
+
+;;; (render-pot-options canv) -> void
+;;;    canv : canvas?
+;;; Renders the pot options on the canvas.
+(define render-pot-options
+  (lambda (canv)
+    (begin
+      (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
+      (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
+      (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
+      (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
+      (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
+      (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))))
+
+;;; (clear-canvas canv) -> void
+;;;    canv : canvas?
+;;; Clears the canvas and draws the background.
+(define clear-canvas
+  (lambda (canv)
+    (canvas-drawing! canv 0 0 (generate-background background-height))))
+
+;;; (render-options-button canv) -> void
+;;;    canv : canvas?
+;;; Renders the main "Options" button on the canvas.
+(define render-options-button
+  (lambda (canv)
+    (begin
+      (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
+      (canvas-text! canv 115 75 "Options" 20 "solid" "black"))))
+
 ;;; (view st canv) -> void
 ;;;    st : state?
 ;;;    canv : canvas?
@@ -595,11 +635,10 @@
               [pot-y (round (* height 0.27))])
          (begin
            ;; Clear the canvas
-           (canvas-drawing! canv 0 0 (generate-background background-height))
+           (clear-canvas canv)
 
            ;; Main "Options" button
-           (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
-           (canvas-text! canv 115 75 "Options" 20 "solid" "black")
+           (render-options-button canv)
 
            ;; Render based on visibility
            (cond
@@ -607,25 +646,15 @@
              [plants-options-visible? (render-plant-options canv)]
 
              ;; Case: Main options are visible
-             [options-visible?
-              (begin
-                (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
-                (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
-                (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
-                (canvas-text! canv 130 245 "Water" 20 "solid" "black"))]
+             [options-visible? (render-main-options canv)]
 
              ;; Default case: Do nothing
              [else #f])
 
            ;; Render pot options if visible
            (if pot-options-visible?
-             (begin
-               (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
-               (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
-               (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
-               (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
-               (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
-               (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))void)
+             (render-pot-options canv)
+             void)
 
            ;; Draw the plants in the pots
            (draw-plant-in-pot canv pot1-x pot-y pot1-plant)
