@@ -561,12 +561,12 @@
          ;; Render pot options if visible
          (if pot-options-visible?
            (begin
-             (canvas-rectangle! canv 400 600 100 50 "solid" "brown")
-             (canvas-text! canv 420 625 "Pot1" 20 "solid" "white")
-             (canvas-rectangle! canv 630 600 100 50 "solid" "brown")
-             (canvas-text! canv 650 625 "Pot2" 20 "solid" "white")
-             (canvas-rectangle! canv 850 600 100 50 "solid" "brown")
-             (canvas-text! canv 870 625 "Pot3" 20 "solid" "white"))void)
+             (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
+             (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
+             (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
+             (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
+             (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
+             (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))void)
 
          ;; Draw the plants in the pots
          (cond
