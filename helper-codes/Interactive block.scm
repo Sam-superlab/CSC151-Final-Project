@@ -371,60 +371,90 @@
 
 (problem "Sunflower")
 
+;;; (sunflower-outer-petals size color1 color2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    color1 : color?
+;;;    color2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the outer petals of a sunflower. `color1` controls the main
+;;; color and `color2` controls the outline color. 
 (define sunflower-outer-petals
-  (lambda ()
-    (|> (polar-plot (lambda (t) (+ 50 (* 27.5 (cos (* 9 t))))) 0 6.3 0.03)
-        (section spiral _ 0.9 10.2 50 200 200 "orange" "yellow"))))
+  (lambda (size color1 color2)
+    (|> (polar-plot (lambda (t) (+ size (* 0.55 size (cos (* 9 t))))) 0 6.3 0.03)
+        (section spiral _ 0.9 10.2 size (* size 3.25) (* size 3.25) color1 color2))))
 
+;;; (sunflower-inner-petals size color1 color2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    color1 : color?
+;;;    color2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the inner petals of a sunflower. `color1` controls the main
+;;; color and `color2` controls the outline color. 
 (define sunflower-inner-petals
-  (lambda ()
-    (|> (list (pair 20 20) (pair 20 10) (pair 10 20) (pair 20 20))
-        (section spiral _ 0.995 0.2 0.5 200 200 "darkgreen" "green"))))
+  (lambda (size color1 color2)
+    (|> (let* ([x1 (* size 0.4)]
+               [x2 (* size 0.2)])
+              (list (pair x1 x1) (pair x1 x2) (pair x2 x1) (pair x1 x1)))
+        (section spiral _ 0.995 0.2 1 (* size 3.25) (* size 3.25) color1 color2))))
 
+;;; (sunflower-seeds size color1 color2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    color1 : color?
+;;;    color2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the seeds of a sunflower. `color1` controls the main
+;;; color and `color2` controls the outline color. 
 (define sunflower-seeds
-  (lambda ()
-    (|> (polar-plot (lambda (t) 3) 0 6.3 (* 0.1 pi))
-        (section map (section shift-pt _ 16 16) _)
-        (section spiral _ 0.993 3.8832215 0.5 200 200 "brown" "black"))))
+  (lambda (size color1 color2)
+    (|> (polar-plot (lambda (t) (* size 0.06)) 0 6.3 (* 0.1 pi))
+        (section map (section shift-pt _ (* size 0.32) (* size 0.32)) _)
+        (section spiral _ 0.993 3.8832215 1 (* size 3.25) (* size 3.25) color1 color2))))
 
+;;; (sunflower-head size oc1 oc2 ic1 ic2 sc1 sc2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    oc1 : color?
+;;;    oc2 : color?
+;;;    ic1 : color?
+;;;    ic2 : color?
+;;;    sc1 : color?
+;;;    sc2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the head of a sunflower, by combining calls to the above 3
+;;; procedures. `oc1` and `oc2` control the color of the outer petals,
+;;; `ic1` and `ic2` control the color of the inner petals, and
+;;; `sc1` and `sc2` control the color of the seeds. 
 (define sunflower-head
-  (overlay (sunflower-seeds) 
-           (sunflower-inner-petals)
-           (sunflower-outer-petals)))
+  (lambda (size oc1 oc2 ic1 ic2 sc1 sc2)
+    (overlay (sunflower-seeds size sc1 sc2)
+             (sunflower-inner-petals size ic1 ic2)
+             (sunflower-outer-petals size oc1 oc2))))
 
+;;; (sunflower size oc1 oc2 ic1 ic2 sc1 sc2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    oc1 : color?
+;;;    oc2 : color?
+;;;    ic1 : color?
+;;;    ic2 : color?
+;;;    sc1 : color?
+;;;    sc2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like a sunflower. `oc1` and `oc2` control the color of the outer petals,
+;;; `ic1` and `ic2` control the color of the inner petals and the stem, and
+;;; `sc1` and `sc2` control the color of the seeds. 
+(define sunflower
+  (lambda (size oc1 oc2 ic1 ic2 sc1 sc2)
+    (overlay/align "middle" "top"
+      (sunflower-head size oc1 oc2 ic1 ic2 sc1 sc2)
+      (above 
+        (solid-square size (rgb 0 0 0 0))
+        (overlay (solid-rectangle (* 0.2 size) (* 3.9 size) ic1)
+                 (solid-rectangle (* 0.3 size) (* 4 size) ic2))))))
 
+;; example of sunflower's configurable size and colors
+; (sunflower 50 "purple" "yellow" "pink" "green" "cyan" "black")
 
-(problem "Water lily")
-
-(define water-lily
-  (lambda (size color)
-    (|> (range (* -1 size) (+ size 0.01) (* 0.5 size))
-        (section map (section pair size _) _)
-        (section map (lambda (p)
-                       (lambda (t)
-                         (* (magnitude p)
-                            (cos (* 3 (- t (angle1 p))))))) _)
-        (section map (section polar-path-solid _ 0 6.29 0.01
-                                                 (* size 4) (* size 4)
-                                                 color) _)
-        (section apply overlay _)
-        (section rotate -90 _)
-        (lambda (img) 
-          (overlay/align "middle" "bottom"
-                         (solid-ellipse (image-width img)
-                                        (* 0.6 (image-height img))
-                                        "green")
-                         img)))))
-
-
-; (problem "Hydrangea")
-
-; (define hydrangea
-;   (|> (polar-plot (lambda (t) (* 20 (cos (* 2 t)))) 0 6.4 0.03)
-;       (section map (section shift-pt _ 90 90) _)
-;       (section spiral _ 0.99 1 1 370 370 "blue" "indigo")))
-
-
+;; default sunflower
+; (sunflower 100 "orange" "yellow" "darkgreen" "green" "brown" "black")
 
 (problem "Stem/branch")
 
@@ -570,21 +600,21 @@
 
          ;; Draw the plants in the pots
          (cond
-           [(string=? pot1-plant "Sunflower") (canvas-drawing! canv 370 200 sunflower-head)]
+           [(string=? pot1-plant "Sunflower") (canvas-drawing! canv 370 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
            [(string=? pot1-plant "Daisy") (canvas-rectangle! canv 370 200 50 50 "solid" "black")]
            [(string=? pot1-plant "Tulip") (canvas-rectangle! canv 370 200 50 50 "solid" "pink")]
            [(string=? pot1-plant "Lily") (canvas-drawing! canv 370 200 (water-lily 150 "pink"))]
            [(string=? pot1-plant "Bamboo") (canvas-drawing! canv 370 200 (rotate 0 stem))]
            [else #f])
          (cond
-           [(string=? pot2-plant "Sunflower") (canvas-drawing! canv 600 200 sunflower-head)]
+           [(string=? pot2-plant "Sunflower") (canvas-drawing! canv 600 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
            [(string=? pot2-plant "Daisy") (canvas-rectangle! canv 600 200 50 50 "solid" "black")]
            [(string=? pot2-plant "Tulip") (canvas-rectangle! canv 600 200 50 50 "solid" "pink")]
            [(string=? pot2-plant "Lily") (canvas-drawing! canv 600 200 (water-lily 150 "pink"))]
            [(string=? pot2-plant "Bamboo") (canvas-drawing! canv 600 200 (rotate 0 stem))]
            [else #f])
          (cond
-           [(string=? pot3-plant "Sunflower") (canvas-drawing! canv 820 200 sunflower-head)]
+           [(string=? pot3-plant "Sunflower") (canvas-drawing! canv 820 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
            [(string=? pot3-plant "Daisy") (canvas-rectangle! canv 820 200 50 50 "solid" "black")]
            [(string=? pot3-plant "Tulip") (canvas-rectangle! canv 820 200 50 50 "solid" "pink")]
            [(string=? pot3-plant "Lily") (canvas-drawing! canv 820 200 (water-lily 150 "pink"))]
