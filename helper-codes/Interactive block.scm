@@ -17,6 +17,8 @@
 
 ;;; (generate-background s) -> drawing?
 ;;;    s : nonnegative-integer?
+;;;    w : nonnegative-integer?
+;;;    h : nonnegative-integer?
 ;;; Generates a background, configurable by size `s`.
 ;;; For our purposes, we will typically pass `background-height` 
 ;;; (see above) for `s`.
@@ -135,7 +137,7 @@
 ;; We can also call it at a smaller size, for easier viewing
 ;; in the exploration pane on the right:
 ;; Uncomment to view:
-(generate-background 200)
+; (generate-background 200)
 
 
 
@@ -500,14 +502,19 @@
   plants-options-visible?  ; boolean, whether the Plants options are displayed
   selected-plant           ; string, the selected plant
   sunflower-visible?       ; boolean, whether the sunflower is visible
+  pot-options-visible?     ; boolean, whether the pot options are displayed
+  selected-pot             ; string, the selected pot
+  pot1-plant               ; string, the plant in pot1
+  pot2-plant               ; string, the plant in pot2
+  pot3-plant               ; string, the plant in pot3
 ))
 
 ;; Initial state
-(define initial-state (state #f #f "" #f))
+(define initial-state (state #f #f "" #f #f "" "" "" ""))
 
 ;; Canvas dimensions
-(define width 800)
-(define height 600)
+(define width background-width)
+(define height background-height)
 
 
 
@@ -515,10 +522,10 @@
 (define view
   (lambda (st canv)
     (match st
-      [(state options-visible? plants-options-visible? selected-plant sunflower-visible?)
+      [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant)
        (begin
          ;; Clear the canvas
-         (canvas-drawing! canv 0 0 (generate-background 500))
+         (canvas-drawing! canv 0 0 (generate-background background-height))
 
          ;; Main "Options" button
          (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
@@ -551,13 +558,37 @@
            ;; Default case: Do nothing
            [else #f])
 
-         ;; Draw the selected plant
+         ;; Render pot options if visible
+         (if pot-options-visible?
+           (begin
+             (canvas-rectangle! canv 400 600 100 50 "solid" "brown")
+             (canvas-text! canv 420 625 "Pot1" 20 "solid" "white")
+             (canvas-rectangle! canv 630 600 100 50 "solid" "brown")
+             (canvas-text! canv 650 625 "Pot2" 20 "solid" "white")
+             (canvas-rectangle! canv 850 600 100 50 "solid" "brown")
+             (canvas-text! canv 870 625 "Pot3" 20 "solid" "white"))void)
+
+         ;; Draw the plants in the pots
          (cond
-           [(and sunflower-visible? (string=? selected-plant "Sunflower")) (canvas-drawing! canv 375 150 sunflower-head)]
-           [(string=? selected-plant "Daisy") (canvas-rectangle! canv 180 300 50 50 "solid" "black")]
-           [(string=? selected-plant "Tulip") (canvas-rectangle! canv 180 300 50 50 "solid" "pink")]
-           [(string=? selected-plant "Lily") (canvas-drawing! canv 400 200 (water-lily 150 "pink"))]
-           [(string=? selected-plant "Bamboo") (canvas-drawing! canv 450 150 (rotate 0 stem))]
+           [(string=? pot1-plant "Sunflower") (canvas-drawing! canv 370 200 sunflower-head)]
+           [(string=? pot1-plant "Daisy") (canvas-rectangle! canv 370 200 50 50 "solid" "black")]
+           [(string=? pot1-plant "Tulip") (canvas-rectangle! canv 370 200 50 50 "solid" "pink")]
+           [(string=? pot1-plant "Lily") (canvas-drawing! canv 370 200 (water-lily 150 "pink"))]
+           [(string=? pot1-plant "Bamboo") (canvas-drawing! canv 370 200 (rotate 0 stem))]
+           [else #f])
+         (cond
+           [(string=? pot2-plant "Sunflower") (canvas-drawing! canv 600 200 sunflower-head)]
+           [(string=? pot2-plant "Daisy") (canvas-rectangle! canv 600 200 50 50 "solid" "black")]
+           [(string=? pot2-plant "Tulip") (canvas-rectangle! canv 600 200 50 50 "solid" "pink")]
+           [(string=? pot2-plant "Lily") (canvas-drawing! canv 600 200 (water-lily 150 "pink"))]
+           [(string=? pot2-plant "Bamboo") (canvas-drawing! canv 600 200 (rotate 0 stem))]
+           [else #f])
+         (cond
+           [(string=? pot3-plant "Sunflower") (canvas-drawing! canv 820 200 sunflower-head)]
+           [(string=? pot3-plant "Daisy") (canvas-rectangle! canv 820 200 50 50 "solid" "black")]
+           [(string=? pot3-plant "Tulip") (canvas-rectangle! canv 820 200 50 50 "solid" "pink")]
+           [(string=? pot3-plant "Lily") (canvas-drawing! canv 820 200 (water-lily 150 "pink"))]
+           [(string=? pot3-plant "Bamboo") (canvas-drawing! canv 820 200 (rotate 0 stem))]
            [else #f]))])))
 
 ;; Update function to handle events
@@ -568,18 +599,23 @@
        (cond
          ;; Main "Options" button
          [(and (> cx 100) (< cx 200) (> cy 50) (< cy 100))
-          (state (not (state-options-visible? st)) #f (state-selected-plant st) (state-sunflower-visible? st))]
+          (state (not (state-options-visible? st)) #f (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
 
          ;; "Plants" button
          [(and (state-options-visible? st) (> cx 100) (< cx 200) (> cy 150) (< cy 200))
-          (state #t #t (state-selected-plant st) (state-sunflower-visible? st))]
+          (state #t #t (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
 
          ;; Plant selection
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sunflower")) (state #t #f "Sunflower" #t)]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Daisy")) (state #t #f "Daisy" (state-sunflower-visible? st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Tulip")) (state #t #f "Tulip" (state-sunflower-visible? st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Lily")) (state #t #f "Lily" (state-sunflower-visible? st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Bamboo")) (state #t #f "Bamboo" (state-sunflower-visible? st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sunflower")) (state #t #f "Sunflower" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Daisy")) (state #t #f "Daisy" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Tulip")) (state #t #f "Tulip" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Lily")) (state #t #f "Lily" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Bamboo")) (state #t #f "Bamboo" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+
+         ;; Pot selection
+         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot1")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot1" (state-selected-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot2")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot2" (state-pot1-plant st) (state-selected-plant st) (state-pot3-plant st))]
+         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot3")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot3" (state-pot1-plant st) (state-pot2-plant st) (state-selected-plant st))]
 
          ;; Default: Return current state
          [else st])]
@@ -602,6 +638,18 @@
        (and (> cx 0) (< cx 100) (> cy 390) (< cy 440))]
       [else #f])))
 
+;; Helper function to check if a pot button was clicked
+(define pot-clicked?
+  (lambda (cx cy pot)
+    (cond
+      [(string=? pot "Pot1")
+       (and (> cx 400) (< cx 500) (> cy 600) (< cy 650))]
+      [(string=? pot "Pot2")
+       (and (> cx 630) (< cx 730) (> cy 600) (< cy 650))]
+      [(string=? pot "Pot3")
+       (and (> cx 850) (< cx 950) (> cy 600) (< cy 650))]
+      [else #f])))
+
 ;; Reactive canvas with subscriptions
 (display
  (reactive-canvas
@@ -610,4 +658,3 @@
    view
    update
    (on-mouse-click)))
-
