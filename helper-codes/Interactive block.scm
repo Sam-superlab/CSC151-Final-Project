@@ -371,19 +371,19 @@
 
 (define sunflower-outer-petals
   (lambda ()
-    (|> (polar-plot (lambda (t) (+ 100 (* 55 (cos (* 9 t))))) 0 6.3 0.03)
-        (section spiral _ 0.9 10.2 100 400 400 "orange" "yellow"))))
+    (|> (polar-plot (lambda (t) (+ 50 (* 27.5 (cos (* 9 t))))) 0 6.3 0.03)
+        (section spiral _ 0.9 10.2 50 200 200 "orange" "yellow"))))
 
 (define sunflower-inner-petals
   (lambda ()
-    (|> (list (pair 40 40) (pair 40 20) (pair 20 40) (pair 40 40))
-        (section spiral _ 0.995 0.2 1 400 400 "darkgreen" "green"))))
+    (|> (list (pair 20 20) (pair 20 10) (pair 10 20) (pair 20 20))
+        (section spiral _ 0.995 0.2 0.5 200 200 "darkgreen" "green"))))
 
 (define sunflower-seeds
   (lambda ()
-    (|> (polar-plot (lambda (t) 6) 0 6.3 (* 0.1 pi))
-        (section map (section shift-pt _ 32 32) _)
-        (section spiral _ 0.993 3.8832215 1 400 400 "brown" "black"))))
+    (|> (polar-plot (lambda (t) 3) 0 6.3 (* 0.1 pi))
+        (section map (section shift-pt _ 16 16) _)
+        (section spiral _ 0.993 3.8832215 0.5 200 200 "brown" "black"))))
 
 (define sunflower-head
   (overlay (sunflower-seeds) 
@@ -499,10 +499,11 @@
   options-visible?         ; boolean, whether the main options are displayed
   plants-options-visible?  ; boolean, whether the Plants options are displayed
   selected-plant           ; string, the selected plant
+  sunflower-visible?       ; boolean, whether the sunflower is visible
 ))
 
 ;; Initial state
-(define initial-state (state #f #f ""))
+(define initial-state (state #f #f "" #f))
 
 ;; Canvas dimensions
 (define width 800)
@@ -514,45 +515,45 @@
 (define view
   (lambda (st canv)
     (match st
-      [(state options-visible? plants-options-visible? selected-plant)
+      [(state options-visible? plants-options-visible? selected-plant sunflower-visible?)
        (begin
          ;; Clear the canvas
          (canvas-drawing! canv 0 0 (generate-background 500))
 
          ;; Main "Options" button
-         (canvas-rectangle! canv 150 50 100 50 "solid" "lightblue")
-         (canvas-text! canv 165 75 "Options" 20 "solid" "black")
+         (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
+         (canvas-text! canv 115 75 "Options" 20 "solid" "black")
 
          ;; Render based on visibility
          (cond
            ;; Case: Plants options are visible
            [plants-options-visible?
             (begin
-              (canvas-rectangle! canv 50 150 100 50 "solid" "green")
-              (canvas-text! canv 60 175 "Sunflower" 20 "solid" "white")
-              (canvas-rectangle! canv 250 150 100 50 "solid" "green")
-              (canvas-text! canv 280 175 "Daisy" 20 "solid" "white")
-              (canvas-rectangle! canv 50 220 100 50 "solid" "green")
-              (canvas-text! canv 85 245 "Tulip" 20 "solid" "white")
-              (canvas-rectangle! canv 150 220 100 50 "solid" "green")
-              (canvas-text! canv 165 245 "Lily" 20 "solid" "white")
-              (canvas-rectangle! canv 250 220 100 50 "solid" "green")
-              (canvas-text! canv 275 245 "Bamboo" 20 "solid" "white"))]
+              (canvas-rectangle! canv 0 150 100 50 "solid" "green")
+              (canvas-text! canv 10 175 "Sunflower" 20 "solid" "white")
+              (canvas-rectangle! canv 0 210 100 50 "solid" "green")
+              (canvas-text! canv 10 235 "Daisy" 20 "solid" "white")
+              (canvas-rectangle! canv 0 270 100 50 "solid" "green")
+              (canvas-text! canv 10 295 "Tulip" 20 "solid" "white")
+              (canvas-rectangle! canv 0 330 100 50 "solid" "green")
+              (canvas-text! canv 10 355 "Lily" 20 "solid" "white")
+              (canvas-rectangle! canv 0 390 100 50 "solid" "green")
+              (canvas-text! canv 10 415 "Bamboo" 20 "solid" "white"))]
 
            ;; Case: Main options are visible
            [options-visible?
             (begin
-              (canvas-rectangle! canv 150 150 100 50 "solid" "lightgreen")
-              (canvas-text! canv 180 175 "Plants" 20 "solid" "black")
-              (canvas-rectangle! canv 150 220 100 50 "solid" "lightcoral")
-              (canvas-text! canv 180 245 "Water" 20 "solid" "black"))]
+              (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
+              (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
+              (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
+              (canvas-text! canv 130 245 "Water" 20 "solid" "black"))]
 
            ;; Default case: Do nothing
            [else #f])
 
          ;; Draw the selected plant
          (cond
-           [(string=? selected-plant "Sunflower") (canvas-drawing! canv 400 200 sunflower-head)]
+           [(and sunflower-visible? (string=? selected-plant "Sunflower")) (canvas-drawing! canv 375 150 sunflower-head)]
            [(string=? selected-plant "Daisy") (canvas-rectangle! canv 180 300 50 50 "solid" "black")]
            [(string=? selected-plant "Tulip") (canvas-rectangle! canv 180 300 50 50 "solid" "pink")]
            [(string=? selected-plant "Lily") (canvas-drawing! canv 400 200 (water-lily 150 "pink"))]
@@ -566,19 +567,19 @@
       [(event-mouse-click _ cx cy)
        (cond
          ;; Main "Options" button
-         [(and (> cx 150) (< cx 250) (> cy 50) (< cy 100))
-          (state (not (state-options-visible? st)) #f "")]
+         [(and (> cx 100) (< cx 200) (> cy 50) (< cy 100))
+          (state (not (state-options-visible? st)) #f (state-selected-plant st) (state-sunflower-visible? st))]
 
          ;; "Plants" button
-         [(and (> cx 150) (< cx 250) (> cy 150) (< cy 200) (state-options-visible? st))
-          (state #t #t "")]
+         [(and (state-options-visible? st) (> cx 100) (< cx 200) (> cy 150) (< cy 200))
+          (state #t #t (state-selected-plant st) (state-sunflower-visible? st))]
 
          ;; Plant selection
-         [(plant-clicked? cx cy "Sunflower") (state #t #f "Sunflower")]
-         [(plant-clicked? cx cy "Daisy") (state #t #f "Daisy")]
-         [(plant-clicked? cx cy "Tulip") (state #t #f "Tulip")]
-         [(plant-clicked? cx cy "Lily") (state #t #f "Lily")]
-         [(plant-clicked? cx cy "Bamboo") (state #t #f "Bamboo")]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sunflower")) (state #t #f "Sunflower" #t)]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Daisy")) (state #t #f "Daisy" (state-sunflower-visible? st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Tulip")) (state #t #f "Tulip" (state-sunflower-visible? st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Lily")) (state #t #f "Lily" (state-sunflower-visible? st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Bamboo")) (state #t #f "Bamboo" (state-sunflower-visible? st))]
 
          ;; Default: Return current state
          [else st])]
@@ -590,17 +591,15 @@
   (lambda (cx cy plant)
     (cond
       [(string=? plant "Sunflower")
-       (and (> cx 50) (< cx 150) (> cy 150) (< cy 200))]
-      [(string=? plant "Sunflower")
-       (and (> cx 150) (< cx 250) (> cy 150) (< cy 200))]
+       (and (> cx 0) (< cx 100) (> cy 150) (< cy 200))]
       [(string=? plant "Daisy")
-       (and (> cx 250) (< cx 350) (> cy 150) (< cy 200))]
+       (and (> cx 0) (< cx 100) (> cy 210) (< cy 260))]
       [(string=? plant "Tulip")
-       (and (> cx 50) (< cx 150) (> cy 220) (< cy 270))]
+       (and (> cx 0) (< cx 100) (> cy 270) (< cy 320))]
       [(string=? plant "Lily")
-       (and (> cx 150) (< cx 250) (> cy 220) (< cy 270))]
+       (and (> cx 0) (< cx 100) (> cy 330) (< cy 380))]
       [(string=? plant "Bamboo")
-       (and (> cx 250) (< cx 350) (> cy 220) (< cy 270))]
+       (and (> cx 0) (< cx 100) (> cy 390) (< cy 440))]
       [else #f])))
 
 ;; Reactive canvas with subscriptions
@@ -611,3 +610,4 @@
    view
    update
    (on-mouse-click)))
+
