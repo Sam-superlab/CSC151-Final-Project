@@ -512,7 +512,7 @@
                              (map (o (section shift-pt _ (car BR-3) (cdr BR-3))
                                      (section scale-rotate _ BL-3f BA-3))
                                   so-far) ; visually, this looks like there is
-                             (list BE-final origin)) ; redundancy to remove
+                             (list BE-final origin)) 
                      (- n 1))])))
 
 (define stem
@@ -546,82 +546,96 @@
 (define width background-width)
 (define height background-height)
 
+;;; (draw-plant-in-pot canv x y plant) -> void
+;;;    canv : canvas?
+;;;    x : number?
+;;;    y : number?
+;;;    plant : string?
+;;; Draws the specified plant at the given coordinates on the canvas.
+(define draw-plant-in-pot
+  (lambda (canv x y plant)
+    (let ([x (round x)]
+          [y (round y)])
+      (cond
+        [(string=? plant "Sunflower") (canvas-drawing! canv x y (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
+        [(string=? plant "Daisy") (canvas-drawing! canv x y (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
+        [(string=? plant "Tulip") (canvas-rectangle! canv x y 50 50 "solid" "pink")]
+        [(string=? plant "Lily") (canvas-drawing! canv x y (water-lily 150 "pink"))]
+        [(string=? plant "Bamboo") (canvas-drawing! canv x y (rotate 0 stem))]
+        [else #f]))))
 
+;;; (render-plant-options canv) -> void
+;;;    canv : canvas?
+;;; Renders the plant options on the canvas.
+(define render-plant-options
+  (lambda (canv)
+    (begin
+      (canvas-rectangle! canv 0 150 100 50 "solid" "green")
+      (canvas-text! canv 10 175 "Sunflower" 20 "solid" "white")
+      (canvas-rectangle! canv 0 210 100 50 "solid" "green")
+      (canvas-text! canv 10 235 "Daisy" 20 "solid" "white")
+      (canvas-rectangle! canv 0 270 100 50 "solid" "green")
+      (canvas-text! canv 10 295 "Tulip" 20 "solid" "white")
+      (canvas-rectangle! canv 0 330 100 50 "solid" "green")
+      (canvas-text! canv 10 355 "Lily" 20 "solid" "white")
+      (canvas-rectangle! canv 0 390 100 50 "solid" "green")
+      (canvas-text! canv 10 415 "Bamboo" 20 "solid" "white"))))
 
-;; View function to render the canvas based on the state
+;;; (view st canv) -> void
+;;;    st : state?
+;;;    canv : canvas?
+;;; Renders the canvas based on the current state.
 (define view
   (lambda (st canv)
     (match st
       [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant)
-       (begin
-         ;; Clear the canvas
-         (canvas-drawing! canv 0 0 (generate-background background-height))
+       (let* ([pot1-x (round (* width 0.27))]
+              [pot2-x (round (* width 0.433))]
+              [pot3-x (round (* width 0.586))]
+              [pot-y (round (* height 0.27))])
+         (begin
+           ;; Clear the canvas
+           (canvas-drawing! canv 0 0 (generate-background background-height))
 
-         ;; Main "Options" button
-         (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
-         (canvas-text! canv 115 75 "Options" 20 "solid" "black")
+           ;; Main "Options" button
+           (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
+           (canvas-text! canv 115 75 "Options" 20 "solid" "black")
 
-         ;; Render based on visibility
-         (cond
-           ;; Case: Plants options are visible
-           [plants-options-visible?
-            (begin
-              (canvas-rectangle! canv 0 150 100 50 "solid" "green")
-              (canvas-text! canv 10 175 "Sunflower" 20 "solid" "white")
-              (canvas-rectangle! canv 0 210 100 50 "solid" "green")
-              (canvas-text! canv 10 235 "Daisy" 20 "solid" "white")
-              (canvas-rectangle! canv 0 270 100 50 "solid" "green")
-              (canvas-text! canv 10 295 "Tulip" 20 "solid" "white")
-              (canvas-rectangle! canv 0 330 100 50 "solid" "green")
-              (canvas-text! canv 10 355 "Lily" 20 "solid" "white")
-              (canvas-rectangle! canv 0 390 100 50 "solid" "green")
-              (canvas-text! canv 10 415 "Bamboo" 20 "solid" "white"))]
+           ;; Render based on visibility
+           (cond
+             ;; Case: Plants options are visible
+             [plants-options-visible? (render-plant-options canv)]
 
-           ;; Case: Main options are visible
-           [options-visible?
-            (begin
-              (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
-              (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
-              (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
-              (canvas-text! canv 130 245 "Water" 20 "solid" "black"))]
+             ;; Case: Main options are visible
+             [options-visible?
+              (begin
+                (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
+                (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
+                (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
+                (canvas-text! canv 130 245 "Water" 20 "solid" "black"))]
 
-           ;; Default case: Do nothing
-           [else #f])
+             ;; Default case: Do nothing
+             [else #f])
 
-         ;; Render pot options if visible
-         (if pot-options-visible?
-           (begin
-             (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
-             (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
-             (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))void)
+           ;; Render pot options if visible
+           (if pot-options-visible?
+             (begin
+               (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
+               (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
+               (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
+               (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
+               (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
+               (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))void)
 
-         ;; Draw the plants in the pots
-         (cond
-           [(string=? pot1-plant "Sunflower") (canvas-drawing! canv 370 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
-           [(string=? pot1-plant "Daisy") (canvas-rectangle! canv 370 200 50 50 "solid" "black")]
-           [(string=? pot1-plant "Tulip") (canvas-rectangle! canv 370 200 50 50 "solid" "pink")]
-           [(string=? pot1-plant "Lily") (canvas-drawing! canv 370 200 (water-lily 150 "pink"))]
-           [(string=? pot1-plant "Bamboo") (canvas-drawing! canv 370 200 (rotate 0 stem))]
-           [else #f])
-         (cond
-           [(string=? pot2-plant "Sunflower") (canvas-drawing! canv 600 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
-           [(string=? pot2-plant "Daisy") (canvas-rectangle! canv 600 200 50 50 "solid" "black")]
-           [(string=? pot2-plant "Tulip") (canvas-rectangle! canv 600 200 50 50 "solid" "pink")]
-           [(string=? pot2-plant "Lily") (canvas-drawing! canv 600 200 (water-lily 150 "pink"))]
-           [(string=? pot2-plant "Bamboo") (canvas-drawing! canv 600 200 (rotate 0 stem))]
-           [else #f])
-         (cond
-           [(string=? pot3-plant "Sunflower") (canvas-drawing! canv 820 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
-           [(string=? pot3-plant "Daisy") (canvas-rectangle! canv 820 200 50 50 "solid" "black")]
-           [(string=? pot3-plant "Tulip") (canvas-rectangle! canv 820 200 50 50 "solid" "pink")]
-           [(string=? pot3-plant "Lily") (canvas-drawing! canv 820 200 (water-lily 150 "pink"))]
-           [(string=? pot3-plant "Bamboo") (canvas-drawing! canv 820 200 (rotate 0 stem))]
-           [else #f]))])))
+           ;; Draw the plants in the pots
+           (draw-plant-in-pot canv pot1-x pot-y pot1-plant)
+           (draw-plant-in-pot canv pot2-x pot-y pot2-plant)
+           (draw-plant-in-pot canv pot3-x pot-y pot3-plant)))])))
 
-;; Update function to handle events
+;;; (update msg st) -> state?
+;;;    msg : event?
+;;;    st : state?
+;;; Handles events and updates the state accordingly.
 (define update
   (lambda (msg st)
     (match msg
@@ -652,7 +666,11 @@
       ;; Default: Return current state
       [else st])))
 
-;; Helper function to check if a plant button was clicked
+;;; (plant-clicked? cx cy plant) -> boolean?
+;;;    cx : number?
+;;;    cy : number?
+;;;    plant : string?
+;;; Checks if a plant button was clicked based on the coordinates.
 (define plant-clicked?
   (lambda (cx cy plant)
     (cond
@@ -668,7 +686,11 @@
        (and (> cx 0) (< cx 100) (> cy 390) (< cy 440))]
       [else #f])))
 
-;; Helper function to check if a pot button was clicked
+;;; (pot-clicked? cx cy pot) -> boolean?
+;;;    cx : number?
+;;;    cy : number?
+;;;    pot : string?
+;;; Checks if a pot button was clicked based on the coordinates.
 (define pot-clicked?
   (lambda (cx cy pot)
     (cond
