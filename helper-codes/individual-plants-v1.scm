@@ -226,28 +226,90 @@
 
 (problem "Sunflower")
 
+;;; (sunflower-outer-petals size color1 color2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    color1 : color?
+;;;    color2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the outer petals of a sunflower. `color1` controls the main
+;;; color and `color2` controls the outline color. 
 (define sunflower-outer-petals
-  (lambda ()
-    (|> (polar-plot (lambda (t) (+ 100 (* 55 (cos (* 9 t))))) 0 6.3 0.03)
-        (section spiral _ 0.9 10.2 100 400 400 "orange" "yellow"))))
+  (lambda (size color1 color2)
+    (|> (polar-plot (lambda (t) (+ size (* 0.55 size (cos (* 9 t))))) 0 6.3 0.03)
+        (section spiral _ 0.9 10.2 size (* size 3.25) (* size 3.25) color1 color2))))
 
+;;; (sunflower-inner-petals size color1 color2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    color1 : color?
+;;;    color2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the inner petals of a sunflower. `color1` controls the main
+;;; color and `color2` controls the outline color. 
 (define sunflower-inner-petals
-  (lambda ()
-    (|> (list (pair 40 40) (pair 40 20) (pair 20 40) (pair 40 40))
-        (section spiral _ 0.995 0.2 1 400 400 "darkgreen" "green"))))
+  (lambda (size color1 color2)
+    (|> (let* ([x1 (* size 0.4)]
+               [x2 (* size 0.2)])
+              (list (pair x1 x1) (pair x1 x2) (pair x2 x1) (pair x1 x1)))
+        (section spiral _ 0.995 0.2 1 (* size 3.25) (* size 3.25) color1 color2))))
 
+;;; (sunflower-seeds size color1 color2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    color1 : color?
+;;;    color2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the seeds of a sunflower. `color1` controls the main
+;;; color and `color2` controls the outline color. 
 (define sunflower-seeds
-  (lambda ()
-    (|> (polar-plot (lambda (t) 6) 0 6.3 (* 0.1 pi))
-        (section map (section shift-pt _ 32 32) _)
-        (section spiral _ 0.993 3.8832215 1 400 400 "brown" "black"))))
+  (lambda (size color1 color2)
+    (|> (polar-plot (lambda (t) (* size 0.06)) 0 6.3 (* 0.1 pi))
+        (section map (section shift-pt _ (* size 0.32) (* size 0.32)) _)
+        (section spiral _ 0.993 3.8832215 1 (* size 3.25) (* size 3.25) color1 color2))))
 
+;;; (sunflower-head size oc1 oc2 ic1 ic2 sc1 sc2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    oc1 : color?
+;;;    oc2 : color?
+;;;    ic1 : color?
+;;;    ic2 : color?
+;;;    sc1 : color?
+;;;    sc2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like the head of a sunflower, by combining calls to the above 3
+;;; procedures. `oc1` and `oc2` control the color of the outer petals,
+;;; `ic1` and `ic2` control the color of the inner petals, and
+;;; `sc1` and `sc2` control the color of the seeds. 
 (define sunflower-head
-  (overlay (sunflower-seeds) 
-           (sunflower-inner-petals)
-           (sunflower-outer-petals)))
+  (lambda (size oc1 oc2 ic1 ic2 sc1 sc2)
+    (overlay (sunflower-seeds size sc1 sc2)
+             (sunflower-inner-petals size ic1 ic2)
+             (sunflower-outer-petals size oc1 oc2))))
 
-sunflower-head
+;;; (sunflower size oc1 oc2 ic1 ic2 sc1 sc2) -> drawing?
+;;;    size : nonnegative-number?
+;;;    oc1 : color?
+;;;    oc2 : color?
+;;;    ic1 : color?
+;;;    ic2 : color?
+;;;    sc1 : color?
+;;;    sc2 : color?
+;;; Returns a drawing with configurable size and color that looks
+;;; like a sunflower. `oc1` and `oc2` control the color of the outer petals,
+;;; `ic1` and `ic2` control the color of the inner petals and the stem, and
+;;; `sc1` and `sc2` control the color of the seeds. 
+(define sunflower
+  (lambda (size oc1 oc2 ic1 ic2 sc1 sc2)
+    (overlay/align "middle" "top"
+      (sunflower-head size oc1 oc2 ic1 ic2 sc1 sc2)
+      (above 
+        (solid-square size (rgb 0 0 0 0))
+        (overlay (solid-rectangle (* 0.2 size) (* 3.9 size) ic1)
+                 (solid-rectangle (* 0.3 size) (* 4 size) ic2))))))
+
+;; example of sunflower's configurable size and colors
+; (sunflower 50 "purple" "yellow" "pink" "green" "cyan" "black")
+
+;; default sunflower
+(sunflower 100 "orange" "yellow" "darkgreen" "green" "brown" "black")
 
 (problem "Sakura")
 
