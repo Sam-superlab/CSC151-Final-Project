@@ -722,6 +722,8 @@
 (define width background-width)
 (define height background-height)
 
+
+
 ;;; (view st canv) -> void
 ;;;    st : state
 ;;;    canv : canvas
@@ -732,11 +734,12 @@
       [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant water-message-visible?)
        (begin
          ;; Clear the canvas
+    
          (canvas-drawing! canv 0 0 (generate-background background-height))
 
          ;; Main "Options" button
          (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
-         (canvas-text! canv 115 75 "Options" 20 "solid" "black")
+         (canvas-text! canv 110 80 "OPTIONS" 17 "solid" "black" (font "Montserrat"))
 
          ;; Render based on visibility
          (cond
@@ -744,23 +747,23 @@
            [plants-options-visible?
             (begin
               (canvas-rectangle! canv 0 150 100 50 "solid" "green")
-              (canvas-text! canv 10 175 "Sunflower" 20 "solid" "white")
+              (canvas-text! canv 12 180 "Sunflower" 15 "solid" "white" (font "Montserrat"))
               (canvas-rectangle! canv 0 210 100 50 "solid" "green")
-              (canvas-text! canv 10 235 "Daisy" 20 "solid" "white")
+              (canvas-text! canv 12 240 "Daisy" 15 "solid" "white" (font "Montserrat"))
               (canvas-rectangle! canv 0 270 100 50 "solid" "green")
-              (canvas-text! canv 10 295 "Sakura" 20 "solid" "white")
+              (canvas-text! canv 12 300 "Sakura" 15 "solid" "white" (font "Montserrat"))
               (canvas-rectangle! canv 0 330 100 50 "solid" "green")
-              (canvas-text! canv 10 355 "Pumpkin" 20 "solid" "white")
+              (canvas-text! canv 12 360 "Pumpkin" 15 "solid" "white" (font "Montserrat"))
               (canvas-rectangle! canv 0 390 100 50 "solid" "green")
-              (canvas-text! canv 10 415 "Bamboo" 20 "solid" "white"))]
+              (canvas-text! canv 12 420 "Bamboo" 15 "solid" "white" (font "Montserrat")))]
 
            ;; Case: Main options are visible
            [options-visible?
             (begin
               (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
-              (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
+              (canvas-text! canv 115 180 "PLANTS" 17 "solid" "black" (font "Montserrat"))
               (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
-              (canvas-text! canv 130 245 "Water" 20 "solid" "black"))]
+              (canvas-text! canv 115 250 "WATER" 17 "solid" "black" (font "Montserrat")))]
 
            ;; Default case: Do nothing
            [else #f])
@@ -769,11 +772,11 @@
          (if pot-options-visible?
            (begin
              (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
+             (canvas-text! canv 442 630 "Pot 1" 17 "solid" "white" (font "Montserrat"))
              (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
+             (canvas-text! canv 672 630 "Pot 2" 17 "solid" "white" (font "Montserrat"))
              (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))void)
+             (canvas-text! canv 892 630 "Pot 3" 17 "solid" "white" (font "Montserrat")))void)
 
          ;; Draw the plants in the pots
          (cond
@@ -801,8 +804,8 @@
          ;; Render water message if visible
          (if water-message-visible?
            (begin
-             (canvas-ellipse! canv 800 200 150 50 0 0 (* 2 pi) "solid" "lightblue")
-             (canvas-text! canv 735 200 "Plants are happy :D" 20 "solid" "black"))void)
+             (canvas-rectangle! canv 525 150 350 100 "solid" "lightyellow")
+             (canvas-text! canv 545 205 "Plants are happy :D" 30 "outline" "forestgreen" (font "Montserrat")))void)
        )])))
 
 ;;; (update msg st) -> state
