@@ -7,8 +7,6 @@
 ;---------------------------------------------Background
 ;; generate-background.scm
 ;; By Sam Hopkins
-(import image)
-
 (define background-width 1390)
 (define background-height 730)
 (define aspect-ratio 
@@ -512,7 +510,7 @@
                              (map (o (section shift-pt _ (car BR-3) (cdr BR-3))
                                      (section scale-rotate _ BL-3f BA-3))
                                   so-far) ; visually, this looks like there is
-                             (list BE-final origin)) 
+                             (list BE-final origin)) ; redundancy to remove
                      (- n 1))])))
 
 (define stem
@@ -521,7 +519,174 @@
       (section map (section scale-rotate _ 2 0.9) _)
       ; (section stitch _ 1)
       (section map (section coord-normal->bad _ 1000 1000) _)
-      (section path 1000 1000 _ "outline" "green")))
+      (section path 1000 1000 _ "outline" "lightgreen")))
+
+
+(problem "Sakura")
+
+(define echo-pts-shallow
+  (lambda (p1 p2 d)
+    (let* ([v (subtract-pt p2 p1)]
+           [m (/ d (magnitude v))]
+           [m1 (* m (car v))]
+           [m2 (* m (cdr v))]
+           [ccw (pair (* -1 m2) m1)])
+          (list (list (add-pt p1 ccw))
+                (list (subtract-pt p1 ccw))))))
+
+(define echo-pts-deep
+  (lambda (p1 p2 d)
+    (let* ([v (subtract-pt p2 p1)]
+           [m (/ d (magnitude v))]
+           [m1 (* m (car v))]
+           [m2 (* m (cdr v))]
+           [ccw (pair (* -1 m2) m1)])
+          (pair (add-pt p2 ccw)
+                (subtract-pt p2 ccw)))))
+
+(define stitcher
+  (lambda (obj p2 d)
+    (match obj
+      [(cons p1 (cons l1 (cons l2 null)))
+       (let* ([adns (echo-pts-deep p1 p2 d)]
+              [h1 (car adns)]
+              [h2 (cdr adns)])
+             (list p2 (cons h1 l1)
+                      (cons h2 l2)))])))
+
+(define stitch
+  (lambda (l d)
+    (let* ([p1 (car l)]
+           [p2 (car (cdr l))]
+           [sh (echo-pts-shallow p1 p2 d)]
+           [iv (list p1 (car sh) (list-ref sh 1))]
+           [r (fold (section stitcher _ _ d) iv (cdr l))]
+           [l1 (reverse (list-ref r 1))]
+           [l2 (list-ref r 2)])
+          (append l1
+                  l2 
+                  (list (car l1))))))
+
+;;; (tree-pts so-far n) -> (list-of pair?)
+;;;    so-far : (list-of pair?)
+;;;    n : nonnegative-integer?
+;;; Creates the points of a tree with `n` levels of recursion. 
+(define tree-pts
+  (lambda (so-far n)
+    (match n
+      [0 so-far]
+      [_ 
+       (tree-pts 
+         (let* ([shift-by (section shift-pt _ 0 250)]
+                [rotation1 (section scale-rotate _ 0.5 (/ pi 2))]
+                [rotation2 (section scale-rotate _ 0.5 (/ pi -10))]
+                [make-left (section map (o shift-by rotation1) _)]
+                [make-right (section map (o shift-by rotation2) _)]
+                [all-pts (car so-far)]
+                [endpts (cdr so-far)]
+                [left (make-left all-pts)]
+                [right (make-right all-pts)])
+               (pair (append (list origin)
+                             left
+                             (reverse left)
+                             right
+                             (reverse right))
+                     (append (make-left endpts)
+                             (make-right endpts))))
+                   (- n 1))])))
+
+
+;; Process the points into something amenable to overlay/offset
+(define my-tree-pts-base
+  (|> (pair (list origin (pair 0 500)) (list (pair 0 500)))
+      (section tree-pts _ 6)
+      (section cdr _)
+      (section map (section coord-normal->bad _ 1000 1000) _)))
+
+(define my-tree-pts-trunk
+  (|> (pair (list origin (pair 0 500)) (list (pair 0 500)))
+      (section tree-pts _ 4)
+      (section car _)
+      (section stitch _ 3)
+      (section map (section coord-normal->bad _ 1000 1000) _)
+      (section path 1000 1000 _ "solid" "brown")))
+
+(define my-tree-pts-leaves
+  (|> my-tree-pts-base
+      (section map (section pair (solid-circle 6 (rgb 255 0 255 50)) _) _)))
+
+;;; (transform-tree-pts l w h)-> image?
+;;;    l : (list-of pair?)
+;;;    w : nonnegative-integer?
+;;;    h : nonnegative-integer?
+;;; Takes a list of image-coordinate pairs and overlays them appropriately
+(define transform-tree-pts
+  (lambda (l w h)
+    (fold (lambda (img p) 
+            (match p
+              [(pair next-img (pair x y)) 
+               (overlay/offset x y img next-img)]))
+          (solid-rectangle w h (rgb 0 0 0 0))
+          l)))
+
+
+; (overlay/offset 6 6
+;   (transform-tree-pts my-tree-pts-leaves 1000 1000)
+;   my-tree-pts-trunk)
+
+(define sakura
+  (overlay/offset 6 6
+    (transform-tree-pts my-tree-pts-leaves 1000 1000)
+    my-tree-pts-trunk))
+
+
+(problem "Pumpkin")
+
+(define number-of-loops 5)
+(define box-size 400)
+
+(define pumpkin-vector
+  (|> (range 0 6.4 (* 0.01 pi))
+      (section map (lambda (t) 
+                     (list (sin t) t))
+                   _)
+      (section make-vector number-of-loops _)))
+
+(define pumpkin-helper
+  (lambda (l i)
+    (match l
+      [(cons r (cons t null))
+       (list (* 170 (expt r (expt 3 (- i 2)))) t)])))
+
+(define repeat-lighter
+  (lambda (c i)
+    ((apply o (make-list i rgb-lighter)) c)))
+
+(define repeat-darker
+  (lambda (c i)
+    ((apply o (make-list i rgb-darker)) c)))
+
+(define pick-orange
+  (lambda (i)
+    (repeat-lighter (repeat-darker (color-name->rgb "orange") 3) (+ i 1))))
+
+(define pumpkin (begin
+  (vector-for-each
+    (lambda (i)
+      (vector-set! pumpkin-vector i (|> (vector-ref pumpkin-vector i)
+                                        (section map (section pumpkin-helper _ i) _))))
+    (vector-range 0 number-of-loops))
+  (vector-map! (section map (section apply polar->cartesian _) _) pumpkin-vector)
+  (vector-map! (section map (section coord-normal->bad _ box-size box-size) _) pumpkin-vector)
+  (vector-for-each
+    (lambda (i)
+      (vector-set! pumpkin-vector i (|> (vector-ref pumpkin-vector i)
+                                        (section path box-size box-size _ "solid" (pick-orange (* 2 i))))))
+    (vector-range 0 (vector-length pumpkin-vector)))
+  (|> pumpkin-vector
+      vector->list
+      reverse
+      (section apply overlay _))))
 
 
 ;;;-----------------------------------------------------------------------------------;;;
@@ -546,125 +711,82 @@
 (define width background-width)
 (define height background-height)
 
-;;; (draw-plant-in-pot canv x y plant) -> void
-;;;    canv : canvas?
-;;;    x : number?
-;;;    y : number?
-;;;    plant : string?
-;;; Draws the specified plant at the given coordinates on the canvas.
-(define draw-plant-in-pot
-  (lambda (canv x y plant)
-    (let ([x (round x)]
-          [y (round y)])
-      (cond
-        [(string=? plant "Sunflower") (canvas-drawing! canv x y (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
-        [(string=? plant "Daisy") (canvas-drawing! canv x y (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
-        [(string=? plant "Tulip") (canvas-rectangle! canv x y 50 50 "solid" "pink")]
-        [(string=? plant "Lily") (canvas-drawing! canv x y (water-lily 150 "pink"))]
-        [(string=? plant "Bamboo") (canvas-drawing! canv x y (rotate 0 stem))]
-        [else #f]))))
 
-;;; (render-plant-options canv) -> void
-;;;    canv : canvas?
-;;; Renders the plant options on the canvas.
-(define render-plant-options
-  (lambda (canv)
-    (begin
-      (canvas-rectangle! canv 0 150 100 50 "solid" "green")
-      (canvas-text! canv 10 175 "Sunflower" 20 "solid" "white")
-      (canvas-rectangle! canv 0 210 100 50 "solid" "green")
-      (canvas-text! canv 10 235 "Daisy" 20 "solid" "white")
-      (canvas-rectangle! canv 0 270 100 50 "solid" "green")
-      (canvas-text! canv 10 295 "Tulip" 20 "solid" "white")
-      (canvas-rectangle! canv 0 330 100 50 "solid" "green")
-      (canvas-text! canv 10 355 "Lily" 20 "solid" "white")
-      (canvas-rectangle! canv 0 390 100 50 "solid" "green")
-      (canvas-text! canv 10 415 "Bamboo" 20 "solid" "white"))))
 
-;;; (render-main-options canv) -> void
-;;;    canv : canvas?
-;;; Renders the main options on the canvas.
-(define render-main-options
-  (lambda (canv)
-    (begin
-      (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
-      (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
-      (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
-      (canvas-text! canv 130 245 "Water" 20 "solid" "black"))))
-
-;;; (render-pot-options canv) -> void
-;;;    canv : canvas?
-;;; Renders the pot options on the canvas.
-(define render-pot-options
-  (lambda (canv)
-    (begin
-      (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
-      (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
-      (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
-      (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
-      (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
-      (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))))
-
-;;; (clear-canvas canv) -> void
-;;;    canv : canvas?
-;;; Clears the canvas and draws the background.
-(define clear-canvas
-  (lambda (canv)
-    (canvas-drawing! canv 0 0 (generate-background background-height))))
-
-;;; (render-options-button canv) -> void
-;;;    canv : canvas?
-;;; Renders the main "Options" button on the canvas.
-(define render-options-button
-  (lambda (canv)
-    (begin
-      (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
-      (canvas-text! canv 115 75 "Options" 20 "solid" "black"))))
-
-;;; (view st canv) -> void
-;;;    st : state?
-;;;    canv : canvas?
-;;; Renders the canvas based on the current state.
+;; View function to render the canvas based on the state
 (define view
   (lambda (st canv)
     (match st
       [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant)
-       (let* ([pot1-x (round (* width 0.27))]
-              [pot2-x (round (* width 0.433))]
-              [pot3-x (round (* width 0.586))]
-              [pot-y (round (* height 0.27))])
-         (begin
-           ;; Clear the canvas
-           (clear-canvas canv)
+       (begin
+         ;; Clear the canvas
+         (canvas-drawing! canv 0 0 (generate-background background-height))
 
-           ;; Main "Options" button
-           (render-options-button canv)
+         ;; Main "Options" button
+         (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
+         (canvas-text! canv 115 75 "Options" 20 "solid" "black")
 
-           ;; Render based on visibility
-           (cond
-             ;; Case: Plants options are visible
-             [plants-options-visible? (render-plant-options canv)]
+         ;; Render based on visibility
+         (cond
+           ;; Case: Plants options are visible
+           [plants-options-visible?
+            (begin
+              (canvas-rectangle! canv 0 150 100 50 "solid" "green")
+              (canvas-text! canv 10 175 "Sunflower" 20 "solid" "white")
+              (canvas-rectangle! canv 0 210 100 50 "solid" "green")
+              (canvas-text! canv 10 235 "Daisy" 20 "solid" "white")
+              (canvas-rectangle! canv 0 270 100 50 "solid" "green")
+              (canvas-text! canv 10 295 "Sakura" 20 "solid" "white")
+              (canvas-rectangle! canv 0 330 100 50 "solid" "green")
+              (canvas-text! canv 10 355 "Pumpkin" 20 "solid" "white")
+              (canvas-rectangle! canv 0 390 100 50 "solid" "green")
+              (canvas-text! canv 10 415 "Bamboo" 20 "solid" "white"))]
 
-             ;; Case: Main options are visible
-             [options-visible? (render-main-options canv)]
+           ;; Case: Main options are visible
+           [options-visible?
+            (begin
+              (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
+              (canvas-text! canv 130 175 "Plants" 20 "solid" "black")
+              (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
+              (canvas-text! canv 130 245 "Water" 20 "solid" "black"))]
 
-             ;; Default case: Do nothing
-             [else #f])
+           ;; Default case: Do nothing
+           [else #f])
 
-           ;; Render pot options if visible
-           (if pot-options-visible?
-             (render-pot-options canv)
-             void)
+         ;; Render pot options if visible
+         (if pot-options-visible?
+           (begin
+             (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
+             (canvas-text! canv 435 625 "Pot1" 20 "solid" "white")
+             (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
+             (canvas-text! canv 665 625 "Pot2" 20 "solid" "white")
+             (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
+             (canvas-text! canv 885 625 "Pot3" 20 "solid" "white"))void)
 
-           ;; Draw the plants in the pots
-           (draw-plant-in-pot canv pot1-x pot-y pot1-plant)
-           (draw-plant-in-pot canv pot2-x pot-y pot2-plant)
-           (draw-plant-in-pot canv pot3-x pot-y pot3-plant)))])))
+         ;; Draw the plants in the pots
+         (cond
+           [(string=? pot1-plant "Sunflower") (canvas-drawing! canv 370 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
+           [(string=? pot1-plant "Daisy") (canvas-drawing! canv 370 200 (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
+           [(string=? pot1-plant "Sakura") (canvas-drawing! canv 0 0 sakura)]
+           [(string=? pot1-plant "Pumpkin") (canvas-drawing! canv 270 300 pumpkin)]
+           [(string=? pot1-plant "Bamboo") (canvas-drawing! canv 380 150 (rotate 0 stem))]
+           [else #f])
+         (cond
+           [(string=? pot2-plant "Sunflower") (canvas-drawing! canv 600 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
+           [(string=? pot2-plant "Daisy") (canvas-drawing! canv 600 200 (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
+           [(string=? pot2-plant "Sakura") (canvas-drawing! canv 180 0 sakura)]
+           [(string=? pot2-plant "Pumpkin") (canvas-drawing! canv 500 300 pumpkin)]
+           [(string=? pot2-plant "Bamboo") (canvas-drawing! canv 600 150 (rotate 0 stem))]
+           [else #f])
+         (cond
+           [(string=? pot3-plant "Sunflower") (canvas-drawing! canv 820 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
+           [(string=? pot3-plant "Daisy") (canvas-drawing! canv 820 200 (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
+           [(string=? pot3-plant "Sakura") (canvas-drawing! canv 400 0 sakura)]
+           [(string=? pot3-plant "Pumpkin") (canvas-drawing! canv 730 300 pumpkin)]
+           [(string=? pot3-plant "Bamboo") (canvas-drawing! canv 820 150 (rotate 0 stem))]
+           [else #f]))])))
 
-;;; (update msg st) -> state?
-;;;    msg : event?
-;;;    st : state?
-;;; Handles events and updates the state accordingly.
+;; Update function to handle events
 (define update
   (lambda (msg st)
     (match msg
@@ -681,8 +803,8 @@
          ;; Plant selection
          [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sunflower")) (state #t #f "Sunflower" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
          [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Daisy")) (state #t #f "Daisy" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Tulip")) (state #t #f "Tulip" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Lily")) (state #t #f "Lily" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sakura")) (state #t #f "Sakura" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Pumpkin")) (state #t #f "Pumpkin" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
          [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Bamboo")) (state #t #f "Bamboo" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
 
          ;; Pot selection
@@ -695,11 +817,7 @@
       ;; Default: Return current state
       [else st])))
 
-;;; (plant-clicked? cx cy plant) -> boolean?
-;;;    cx : number?
-;;;    cy : number?
-;;;    plant : string?
-;;; Checks if a plant button was clicked based on the coordinates.
+;; Helper function to check if a plant button was clicked
 (define plant-clicked?
   (lambda (cx cy plant)
     (cond
@@ -707,19 +825,15 @@
        (and (> cx 0) (< cx 100) (> cy 150) (< cy 200))]
       [(string=? plant "Daisy")
        (and (> cx 0) (< cx 100) (> cy 210) (< cy 260))]
-      [(string=? plant "Tulip")
+      [(string=? plant "Sakura")
        (and (> cx 0) (< cx 100) (> cy 270) (< cy 320))]
-      [(string=? plant "Lily")
+      [(string=? plant "Pumpkin")
        (and (> cx 0) (< cx 100) (> cy 330) (< cy 380))]
       [(string=? plant "Bamboo")
        (and (> cx 0) (< cx 100) (> cy 390) (< cy 440))]
       [else #f])))
 
-;;; (pot-clicked? cx cy pot) -> boolean?
-;;;    cx : number?
-;;;    cy : number?
-;;;    pot : string?
-;;; Checks if a pot button was clicked based on the coordinates.
+;; Helper function to check if a pot button was clicked
 (define pot-clicked?
   (lambda (cx cy pot)
     (cond
