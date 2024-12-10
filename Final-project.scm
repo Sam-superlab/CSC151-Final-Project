@@ -462,72 +462,7 @@
 ;; default sunflower
 ; (sunflower 100 "orange" "yellow" "darkgreen" "green" "brown" "black")
 
-(problem "Stem/branch")
 
-;;; These are the points that will make up our first branch.
-;;; In the future, this should be generalized to remove the "magic numbers".
-;;; We have the branch roots (BR) and branch ends (BE).
-(define BR-1 (pair 50 25))
-(define BR-2 (pair 80 40))
-(define BR-3 (pair 120 60))
-(define BE-1 (pair 70 100))
-(define BE-2 (pair 130 20))
-(define BE-3 (pair 140 95))
-(define BE-final (pair 170 85))
-
-(define example-pts 
-  (list origin 
-        BR-1 BE-1 BR-1
-        BR-2 BE-2 BR-2
-        BR-3 BE-3 BR-3 
-        BE-final origin))
-
-;;; The branch lengths (BL)
-(define BL-total (magnitude BE-final))
-(define BL-1 (distance BR-1 BE-1))
-(define BL-2 (distance BR-2 BE-2))
-(define BL-3 (distance BR-3 BE-3))
-
-;;; Branch lengths as fractions of total length. 
-;;; These will be the det values for scale-rotate
-(define BL-1f (/ BL-1 BL-total))
-(define BL-2f (/ BL-2 BL-total))
-(define BL-3f (/ BL-3 BL-total))
-
-;;; Branch angles (BA) 
-;;; These will be the theta values for scale-rotate
-(define BA-1 (angle2 BE-final (subtract-pt BE-1 BR-1)))
-(define BA-2 (angle2 BE-final (subtract-pt BE-2 BR-2)))
-(define BA-3 (angle2 BE-final (subtract-pt BE-3 BR-3)))
-
-;;; (branch-pts so-far n) -> (list-of pair?)
-;;;    so-far : (list-of pair?)
-;;;    n : nonnegative-integer?
-;;; Creates a branch with `n` levels of recursion.
-(define branch-pts
-  (lambda (so-far n)
-    (match n
-      [0 so-far]
-      [_ (branch-pts (append (list (pair 0 0))
-                             (map (o (section shift-pt _ (car BR-1) (cdr BR-1))
-                                     (section scale-rotate _ BL-1f BA-1))
-                                  so-far)
-                             (map (o (section shift-pt _ (car BR-2) (cdr BR-2))
-                                     (section scale-rotate _ BL-2f (* -1 BA-2)))
-                                  so-far)
-                             (map (o (section shift-pt _ (car BR-3) (cdr BR-3))
-                                     (section scale-rotate _ BL-3f BA-3))
-                                  so-far) ; visually, this looks like there is
-                             (list BE-final origin)) ; redundancy to remove
-                     (- n 1))])))
-
-(define stem
-  (|> example-pts
-      (section branch-pts _ 6)
-      (section map (section scale-rotate _ 2 0.9) _)
-      ; (section stitch _ 1)
-      (section map (section coord-normal->bad _ 1000 1000) _)
-      (section path 1000 1000 _ "outline" "lightgreen")))
 
 
 (problem "Sakura")
@@ -696,10 +631,90 @@
       reverse
       (section apply overlay _))))
 
+(problem "Stem/branch")
+
+;;; These are the points that will make up our first branch.
+;;; In the future, this should be generalized to remove the "magic numbers".
+;;; We have the branch roots (BR) and branch ends (BE).
+(define BR-1 (pair 50 25))
+(define BR-2 (pair 80 40))
+(define BR-3 (pair 120 60))
+(define BE-1 (pair 70 100))
+(define BE-2 (pair 130 20))
+(define BE-3 (pair 140 95))
+(define BE-final (pair 170 85))
+
+(define example-pts 
+  (list origin 
+        BR-1 BE-1 BR-1
+        BR-2 BE-2 BR-2
+        BR-3 BE-3 BR-3 
+        BE-final origin))
+
+;;; The branch lengths (BL)
+(define BL-total (magnitude BE-final))
+(define BL-1 (distance BR-1 BE-1))
+(define BL-2 (distance BR-2 BE-2))
+(define BL-3 (distance BR-3 BE-3))
+
+;;; Branch lengths as fractions of total length. 
+;;; These will be the det values for scale-rotate
+(define BL-1f (/ BL-1 BL-total))
+(define BL-2f (/ BL-2 BL-total))
+(define BL-3f (/ BL-3 BL-total))
+
+;;; Branch angles (BA) 
+;;; These will be the theta values for scale-rotate
+(define BA-1 (angle2 BE-final (subtract-pt BE-1 BR-1)))
+(define BA-2 (angle2 BE-final (subtract-pt BE-2 BR-2)))
+(define BA-3 (angle2 BE-final (subtract-pt BE-3 BR-3)))
+
+;;; (branch-pts so-far n) -> (list-of pair?)
+;;;    so-far : (list-of pair?)
+;;;    n : nonnegative-integer?
+;;; Creates a branch with `n` levels of recursion.
+(define branch-pts
+  (lambda (so-far n)
+    (match n
+      [0 so-far]
+      [_ (branch-pts (append (list (pair 0 0))
+                             (map (o (section shift-pt _ (car BR-1) (cdr BR-1))
+                                     (section scale-rotate _ BL-1f BA-1))
+                                  so-far)
+                             (map (o (section shift-pt _ (car BR-2) (cdr BR-2))
+                                     (section scale-rotate _ BL-2f (* -1 BA-2)))
+                                  so-far)
+                             (map (o (section shift-pt _ (car BR-3) (cdr BR-3))
+                                     (section scale-rotate _ BL-3f BA-3))
+                                  so-far) ; visually, this looks like there is
+                             (list BE-final origin)) ; redundancy to remove
+                     (- n 1))])))
+
+(define stem
+  (|> example-pts
+      (section branch-pts _ 6)
+      (section map (section scale-rotate _ 2 0.9) _)
+      (section stitch _ 1)
+      (section map (section coord-normal->bad _ 1000 1000) _)
+      (section path 1000 1000 _ "outline" "lightgreen")))
+
 
 
 
 (description "code stored in interactive-plant.scm")
+
+;;; (my-canvas-drawing! canvas x y drawing) -> void?
+;;;    canvas : canvas?
+;;;    x : nonnegative-integer?
+;;;    y : nonnegative-integer?
+;;;    drawing : drawing?
+;;; Mutates `canvas` so that `drawing` appears with its center
+;;; aligned with `x` and its bottom aligned with `y`.
+(define my-canvas-drawing!
+  (lambda (canvas x y drawing)
+    (let* ([adj-x (- x (* 0.5 (image-width drawing)))]
+           [adj-y (- y (image-height drawing))])
+          (canvas-drawing! canvas (round adj-x) (round adj-y) drawing))))
 
 ;; Adjusted State Structure
 (struct state (
@@ -722,7 +737,58 @@
 (define width background-width)
 (define height background-height)
 
+;; Pot positions
+(define pot1-x  (* 0.34 width))
+(define pot1-y  (* 0.68 height))
+(define pot2-x (* 0.5 width))
+(define pot2-y  (* 0.68 height))
+(define pot3-x  (* 0.66 width))
+(define pot3-y (* 0.68 height))
 
+(define sunflower-drawing (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))
+(define daisy-drawing (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))
+(define bamboo-drawing (rotate 0 stem))
+
+;;; (my-button canv x y color text) -> void
+;;;    canv : canvas
+;;;    x : number
+;;;    y : number
+;;;    color : string
+;;;    text : string
+;;; Draws a button with the given parameters on the canvas.
+(define my-button
+  (lambda (canv x y color text)
+    (begin
+    (canvas-rectangle! canv x y 100 50 "solid" color)
+    (canvas-text! canv (+ x 15) (+ y 25) text 20 "solid" "black"))))
+
+;;; (pot-button canv x y label) -> void
+;;;    canv : canvas
+;;;    x : number
+;;;    y : number
+;;;    label : string
+;;; Draws a pot button with the given parameters on the canvas.
+(define pot-button
+  (lambda (canv x y label)
+    (begin
+      (canvas-ellipse! canv x y 50 25 0 0 (* 2 pi) "solid" "brown")
+      (canvas-text! canv (- x 30) y label 20 "solid" "white"))))
+
+;;; (draw-plant-in-pot canv x y plant) -> void
+;;;    canv : canvas
+;;;    x : number
+;;;    y : number
+;;;    plant : string
+;;; Draws the specified plant in the pot at the given coordinates.
+(define draw-plant-in-pot
+  (lambda (canv x y plant)
+    (cond
+      [(string=? plant "Sunflower") (my-canvas-drawing! canv x y sunflower-drawing)]
+      [(string=? plant "Daisy") (my-canvas-drawing! canv x y daisy-drawing)]
+      [(string=? plant "Sakura") (my-canvas-drawing! canv x y sakura)]
+      [(string=? plant "Pumpkin") (my-canvas-drawing! canv x (+ y 200) pumpkin)]
+      [(string=? plant "Bamboo") (my-canvas-drawing! canv x y bamboo-drawing)]
+      [else #f])))
 
 ;;; (view st canv) -> void
 ;;;    st : state
@@ -734,36 +800,27 @@
       [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant water-message-visible?)
        (begin
          ;; Clear the canvas
-    
          (canvas-drawing! canv 0 0 (generate-background background-height))
 
          ;; Main "Options" button
-         (canvas-rectangle! canv 100 50 100 50 "solid" "lightblue")
-         (canvas-text! canv 110 80 "OPTIONS" 17 "solid" "black" (font "Montserrat"))
+         (my-button canv 100 50 "lightblue" "Options")
 
          ;; Render based on visibility
          (cond
            ;; Case: Plants options are visible
            [plants-options-visible?
             (begin
-              (canvas-rectangle! canv 0 150 100 50 "solid" "green")
-              (canvas-text! canv 12 180 "Sunflower" 15 "solid" "white" (font "Montserrat"))
-              (canvas-rectangle! canv 0 210 100 50 "solid" "green")
-              (canvas-text! canv 12 240 "Daisy" 15 "solid" "white" (font "Montserrat"))
-              (canvas-rectangle! canv 0 270 100 50 "solid" "green")
-              (canvas-text! canv 12 300 "Sakura" 15 "solid" "white" (font "Montserrat"))
-              (canvas-rectangle! canv 0 330 100 50 "solid" "green")
-              (canvas-text! canv 12 360 "Pumpkin" 15 "solid" "white" (font "Montserrat"))
-              (canvas-rectangle! canv 0 390 100 50 "solid" "green")
-              (canvas-text! canv 12 420 "Bamboo" 15 "solid" "white" (font "Montserrat")))]
+              (my-button canv 0 150 "green" "Sunflower")
+              (my-button canv 0 210 "green" "Daisy")
+              (my-button canv 0 270 "green" "Sakura")
+              (my-button canv 0 330 "green" "Pumpkin")
+              (my-button canv 0 390 "green" "Bamboo"))]
 
            ;; Case: Main options are visible
            [options-visible?
             (begin
-              (canvas-rectangle! canv 100 150 100 50 "solid" "lightgreen")
-              (canvas-text! canv 115 180 "PLANTS" 17 "solid" "black" (font "Montserrat"))
-              (canvas-rectangle! canv 100 220 100 50 "solid" "lightcoral")
-              (canvas-text! canv 115 250 "WATER" 17 "solid" "black" (font "Montserrat")))]
+              (my-button canv 100 150 "lightgreen" "Plants")
+              (my-button canv 100 220 "lightcoral" "Water"))]
 
            ;; Default case: Do nothing
            [else #f])
@@ -771,41 +828,21 @@
          ;; Render pot options if visible
          (if pot-options-visible?
            (begin
-             (canvas-ellipse! canv 465 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 442 630 "Pot 1" 17 "solid" "white" (font "Montserrat"))
-             (canvas-ellipse! canv 695 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 672 630 "Pot 2" 17 "solid" "white" (font "Montserrat"))
-             (canvas-ellipse! canv 915 625 50 25 0 0 (* 2 pi) "solid" "brown")
-             (canvas-text! canv 892 630 "Pot 3" 17 "solid" "white" (font "Montserrat")))void)
+             (pot-button canv 465 625 "Pot1")
+             (pot-button canv 695 625 "Pot2")
+             (pot-button canv 915 625 "Pot3"))
+           void)
 
          ;; Draw the plants in the pots
-         (cond
-           [(string=? pot1-plant "Sunflower") (canvas-drawing! canv 370 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
-           [(string=? pot1-plant "Daisy") (canvas-drawing! canv 370 200 (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
-           [(string=? pot1-plant "Sakura") (canvas-drawing! canv 0 0 sakura)]
-           [(string=? pot1-plant "Pumpkin") (canvas-drawing! canv 270 300 pumpkin)]
-           [(string=? pot1-plant "Bamboo") (canvas-drawing! canv 380 150 (rotate 0 stem))]
-           [else #f])
-         (cond
-           [(string=? pot2-plant "Sunflower") (canvas-drawing! canv 600 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
-           [(string=? pot2-plant "Daisy") (canvas-drawing! canv 600 200 (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
-           [(string=? pot2-plant "Sakura") (canvas-drawing! canv 180 0 sakura)]
-           [(string=? pot2-plant "Pumpkin") (canvas-drawing! canv 500 300 pumpkin)]
-           [(string=? pot2-plant "Bamboo") (canvas-drawing! canv 600 150 (rotate 0 stem))]
-           [else #f])
-         (cond
-           [(string=? pot3-plant "Sunflower") (canvas-drawing! canv 820 200 (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))]
-           [(string=? pot3-plant "Daisy") (canvas-drawing! canv 820 200 (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))]
-           [(string=? pot3-plant "Sakura") (canvas-drawing! canv 400 0 sakura)]
-           [(string=? pot3-plant "Pumpkin") (canvas-drawing! canv 730 300 pumpkin)]
-           [(string=? pot3-plant "Bamboo") (canvas-drawing! canv 820 150 (rotate 0 stem))]
-           [else #f])
+         (draw-plant-in-pot canv pot1-x pot1-y pot1-plant)
+         (draw-plant-in-pot canv pot2-x pot2-y pot2-plant)
+         (draw-plant-in-pot canv pot3-x pot3-y pot3-plant)
 
          ;; Render water message if visible
          (if water-message-visible?
            (begin
-             (canvas-rectangle! canv 525 150 350 100 "solid" "lightyellow")
-             (canvas-text! canv 545 205 "Plants are happy :D" 30 "outline" "forestgreen" (font "Montserrat")))void)
+             (canvas-ellipse! canv 800 200 150 50 0 0 (* 2 pi) "solid" "lightblue")
+             (canvas-text! canv 735 200 "Plants are happy :D" 20 "solid" "black"))void)
        )])))
 
 ;;; (update msg st) -> state
