@@ -4,6 +4,19 @@
 (import image)
 (import html)
 
+;;; (my-canvas-drawing! canvas x y drawing) -> void?
+;;;    canvas : canvas?
+;;;    x : nonnegative-integer?
+;;;    y : nonnegative-integer?
+;;;    drawing : drawing?
+;;; Mutates `canvas` so that `drawing` appears with its center
+;;; aligned with `x` and its bottom aligned with `y`.
+(define my-canvas-drawing!
+  (lambda (canvas x y drawing)
+    (let* ([adj-x (- x (* 0.5 (image-width drawing)))]
+           [adj-y (- y (image-height drawing))])
+          (canvas-drawing! canvas adj-x adj-y drawing))))
+
 ;; Adjusted State Structure
 (struct state (
   options-visible?         ; boolean, whether the main options are displayed
