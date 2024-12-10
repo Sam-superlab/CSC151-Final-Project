@@ -25,9 +25,10 @@
 (define width background-width)
 (define height background-height)
 
-
-
-;; View function to render the canvas based on the state
+;;; (view st canv) -> void
+;;;    st : state
+;;;    canv : canvas
+;;; Renders the canvas based on the current state.
 (define view
   (lambda (st canv)
     (match st
@@ -107,7 +108,10 @@
              (canvas-text! canv 735 200 "Plants are happy :D" 20 "solid" "black"))void)
        )])))
 
-;; Update function to handle events
+;;; (update msg st) -> state
+;;;    msg : event
+;;;    st : state
+;;; Updates the state based on the event message.
 (define update
   (lambda (msg st)
     (match msg
@@ -142,7 +146,11 @@
       ;; Default: Return current state
       [else st])))
 
-;; Helper function to check if a plant button was clicked
+;;; (plant-clicked? cx cy plant) -> boolean
+;;;    cx : number
+;;;    cy : number
+;;;    plant : string
+;;; Checks if a plant button was clicked based on the coordinates.
 (define plant-clicked?
   (lambda (cx cy plant)
     (cond
@@ -158,7 +166,11 @@
        (and (> cx 0) (< cx 100) (> cy 390) (< cy 440))]
       [else #f])))
 
-;; Helper function to check if a pot button was clicked
+;;; (pot-clicked? cx cy pot) -> boolean
+;;;    cx : number
+;;;    cy : number
+;;;    pot : string
+;;; Checks if a pot button was clicked based on the coordinates.
 (define pot-clicked?
   (lambda (cx cy pot)
     (cond
@@ -170,7 +182,15 @@
        (and (> cx 850) (< cx 950) (> cy 600) (< cy 650))]
       [else #f])))
 
-;; Reactive canvas with subscriptions
+;;; (reactive-canvas width height initial-state view update on-mouse-click) -> void
+;;;    width : number
+;;;    height : number
+;;;    initial-state : state
+;;;    view : (state canvas -> void)
+;;;    update : (event state -> state)
+;;;    on-mouse-click : event
+;;; Creates a reactive canvas with the given dimensions, initial state,
+;;; view function, update function, and mouse click event subscription.
 (display
  (reactive-canvas
    width height
