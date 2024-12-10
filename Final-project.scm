@@ -701,6 +701,11 @@
 
 (description "code stored in interactive-plant.scm")
 
+(import canvas)
+(import reactive)
+(import lab)
+(import image)
+(import html)
 
 ;; Adjusted State Structure
 (struct state (
@@ -713,10 +718,11 @@
   pot1-plant               ; string, the plant in pot1
   pot2-plant               ; string, the plant in pot2
   pot3-plant               ; string, the plant in pot3
+  water-message-visible?   ; boolean, whether the water message is visible
 ))
 
 ;; Initial state
-(define initial-state (state #f #f "" #f #f "" "" "" ""))
+(define initial-state (state #f #f "" #f #f "" "" "" "" #f))
 
 ;; Canvas dimensions
 (define width background-width)
@@ -728,7 +734,7 @@
 (define view
   (lambda (st canv)
     (match st
-      [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant)
+      [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant water-message-visible?)
        (begin
          ;; Clear the canvas
          (canvas-drawing! canv 0 0 (generate-background background-height))
@@ -795,7 +801,14 @@
            [(string=? pot3-plant "Sakura") (canvas-drawing! canv 400 0 sakura)]
            [(string=? pot3-plant "Pumpkin") (canvas-drawing! canv 730 300 pumpkin)]
            [(string=? pot3-plant "Bamboo") (canvas-drawing! canv 820 150 (rotate 0 stem))]
-           [else #f]))])))
+           [else #f])
+
+         ;; Render water message if visible
+         (if water-message-visible?
+           (begin
+             (canvas-ellipse! canv 800 200 150 50 0 0 (* 2 pi) "solid" "lightblue")
+             (canvas-text! canv 725 200 "Plants are happy :D" 20 "solid" "black")) void)
+       )])))
 
 ;; Update function to handle events
 (define update
@@ -805,23 +818,27 @@
        (cond
          ;; Main "Options" button
          [(and (> cx 100) (< cx 200) (> cy 50) (< cy 100))
-          (state (not (state-options-visible? st)) #f (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+          (state (not (state-options-visible? st)) #f (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
 
          ;; "Plants" button
          [(and (state-options-visible? st) (> cx 100) (< cx 200) (> cy 150) (< cy 200))
-          (state #t #t (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+          (state #t #t (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
 
          ;; Plant selection
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sunflower")) (state #t #f "Sunflower" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Daisy")) (state #t #f "Daisy" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sakura")) (state #t #f "Sakura" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Pumpkin")) (state #t #f "Pumpkin" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
-         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Bamboo")) (state #t #f "Bamboo" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st))]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sunflower")) (state #t #f "Sunflower" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Daisy")) (state #t #f "Daisy" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Sakura")) (state #t #f "Sakura" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Pumpkin")) (state #t #f "Pumpkin" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
+         [(and (state-plants-options-visible? st) (plant-clicked? cx cy "Bamboo")) (state #t #f "Bamboo" #f #t (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
 
          ;; Pot selection
-         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot1")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot1" (state-selected-plant st) (state-pot2-plant st) (state-pot3-plant st))]
-         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot2")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot2" (state-pot1-plant st) (state-selected-plant st) (state-pot3-plant st))]
-         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot3")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot3" (state-pot1-plant st) (state-pot2-plant st) (state-selected-plant st))]
+         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot1")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot1" (state-selected-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
+         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot2")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot2" (state-pot1-plant st) (state-selected-plant st) (state-pot3-plant st) #f)]
+         [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot3")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot3" (state-pot1-plant st) (state-pot2-plant st) (state-selected-plant st) #f)]
+
+         ;; "Water" button
+         [(and (state-options-visible? st) (> cx 100) (< cx 200) (> cy 220) (< cy 270))
+          (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) (state-pot-options-visible? st) (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #t)]
 
          ;; Default: Return current state
          [else st])]
@@ -864,9 +881,3 @@
    view
    update
    (on-mouse-click)))
-
-
-
-
-
-
