@@ -222,6 +222,271 @@
         (section map (section coord-normal->bad _ w h) _)
         (section path w h _ "solid" color))))
 
+(part "Tree procedures")
+
+;;; Struct definitions for handling tree structures
+;;; (in the very literal sense of making visual art of trees)
+(struct node (coord dir depth branches))
+
+;;; Next, we establish some helper functions to make operating over trees
+;;; more convenient. Note that while the documentation strings sometimes
+;;; indicate parameters should be of a certain type as a reminder of their
+;;; purpose (e.g., depth will be a number), these requirements will not always
+;;; be enforced in our functions' implementation (e.g. the `tree?` predicate),
+;;; rather we will assume some preconditions are met. 
+
+;;; (true? v) -> boolean?
+;;;    v : any?
+;;; Returns #t iff v is #t
+(define true?
+  (section equal? #t _))
+
+;;; (tree? T) -> boolean?
+;;;    T : any?
+;;; Returns #t iff `T` is a tree.
+(define tree?
+  (lambda (T)
+    (match T 
+      [(node _ _ _ branches)
+       (and (list? branches)
+            ((list-of true?)
+             (map tree? branches)))]
+      [_ #f])))
+
+;;; (leaf coord dir depth) -> node?
+;;;    coord : pair?
+;;;    dir : any?
+;;;    depth : number?
+;;; Returns a node of degree one (in the graph-theoretic sense), 
+;;; i.e., the only adjacent node is the parent, there are no children. 
+;;; This is sometimes called a singleton.
+(define leaf
+  (lambda (coord dir depth)
+    (node coord dir depth null)))
+
+;;; (leaf? T) -> boolean?
+;;;    T : any?
+;;; Returns true iff `T` is a leaf in the sense defined above.
+(define leaf?
+  (lambda (T)
+    (and (node? T)
+         (null? (node-branches T)))))
+
+;;; (root coord dir depth branch) -> node?
+;;;    coord : pair?
+;;;    dir : any?
+;;;    depth : number?
+;;;    branch : tree?
+;;; Returns a node with only one branch, for the base of
+;;; a tree (in this case it is technically a leaf as well, 
+;;; although our procedures will not treat it as such)
+(define root
+  (lambda (coord dir depth branch)
+    (node coord dir depth (cons branch null))))
+
+;;; (root? T) -> boolean?
+;;;    T : tree?
+;;; Returns true iff `T` is a root in the sense that it
+;;; has only one branch. 
+(define root?
+  (lambda (T)
+    (match T
+      [(node _ _ _ (cons (node _ _ _ _) null))
+       #t]
+      [_ #f])))
+
+;;; (node-branch1 T) -> tree?
+;;;    T : tree?, not a leaf
+;;; Returns the first branch of `T`. 
+(define node-branch1
+  (lambda (T)
+    (if (leaf? T)
+        (error
+         "node-branch1 expected a node with branches, received a leaf")
+        (car (node-branches T)))))
+
+;;; (node-branch T) -> tree?
+;;;    T : tree?, not a leaf
+;;; Alias for `node-branch1` (see above)
+(define node-branch node-branch1)
+
+;;; (node-branch2 T) -> tree?
+;;;    T : tree?, not a leaf or root
+;;; Returns the second branch of `T`. 
+(define node-branch2
+  (lambda (T)
+    (cond 
+      [(leaf? T)
+       (error
+         "node-branch2 expected a node with branches, received a leaf")]
+      [(root? T)
+       (error
+         "node-branch2 expected a node with >=2 branches, received a root")]
+      [(node? T)
+       (car (cdr (node-branches T)))]
+      [_ (error "node-branch2 expected a tree, received something else")])))
+
+;;; (tree-map f T) -> tree?
+;;;    f : procedure? (takes and outputs a pair of numbers)
+;;;    T : tree?
+;;; Transforms all the coord fields in `T` by applying `f`. Also increments
+;;; each `depth` field. 
+(define tree-map
+  (lambda (f T)
+    (match T
+      [(node coord dir depth branches)
+       (node (f coord) dir (+ 1 depth) 
+             (map (section tree-map f _) branches))]
+      [_
+       (error "tree-map expected a tree, received something else")])))
+
+;;; (evolve-tree T ht det1 det2 theta1 theta2) -> tree?
+;;;    T : root?
+;;;    ht : nonnegative-number?
+;;;    det1 : number?
+;;;    det2 : number?
+;;;    theta1 : number?
+;;;    theta2 : number?
+;;; Increases the number of coordinates in `T` by means of rotating,
+;;; scaling, and duplicating the existing tree's coordinates. In particular, 
+;;; two copies of `T` are made, the first of which is rotated by `theta1`
+;;; and scaled by `det1` and the second of which is rotated by `theta2`
+;;; and scaled by `det2`. Both copies are then shifted upward by `ht`
+;;; (generally the height of the central node).
+(define evolve-tree
+  (lambda (T ht det1 det2 theta1 theta2)
+    (match T
+      [(node coord dir depth (cons branch null))
+       (let* ([inc-ht (section shift-pt _ 0 ht)]
+              [f1 (o inc-ht (section scale-rotate _ det1 theta1))]
+              [f2 (o inc-ht (section scale-rotate _ det2 theta2))])
+             (root coord dir depth 
+                   (node (node-coord branch)
+                         (node-dir branch)
+                         (node-depth branch)
+                         (list (tree-map f1 branch)
+                               (tree-map f2 branch)))))])))
+
+;;; (update-dir branch c) -> node?
+;;;    branch : node?
+;;;    c : pair?, elements are numbers
+;;; Returns a new node based on `branch` with the direction
+;;; field updated so that it contains the coordinate point
+;;; representing the change in direction of the coord field
+;;; of `branch` with respect to the point `c`
+(define update-dir
+  (lambda (branch c)
+    (match branch
+      [(node coord _ depth branches)
+       (node coord
+             (subtract-pt coord c)
+             depth branches)])))
+
+;;; (calculate-dir T) -> tree?
+;;;    T : tree?
+;;; Recursively updates all the direction fields contained in the tree `T`
+;;; so that they indicate the change in direction of each coordinate
+;;; compared to the coordinate of the parent node
+(define calculate-dir
+  (lambda (T)
+    (match T
+      [(node coord dir depth branches)
+       (node coord dir depth 
+             (map 
+               (lambda (branch)
+                 (if (leaf? branch)
+                     (update-dir branch coord)
+                     (calculate-dir (update-dir branch coord))))
+               branches))]
+      [_ (error "calculate-dir expected a tree, received something else")])))
+
+;;; (trace-tree T) -> (list-of pair?)
+;;;    T : node?
+;;;    d : positive-number?
+;;;    so-far : (list-of pair?)
+;;; Attempts to create a list of points that traces around the given tree `T`.
+;;; `d` controls the thickness of the trace, and `so-far` is the initial
+;;; list of points. 
+(define trace-tree
+  (lambda (d T so-far)
+    (let* ([coord (node-coord T)])
+          (if (leaf? T)
+              (cons coord so-far)
+              (let* ([v (node-dir T)]
+                     [m (/ d
+                           (magnitude v)
+                           (node-depth T))]
+                     [m1 (* m (car v))]
+                     [m2 (* m (cdr v))]
+                     [ccw (pair (* -1 m2) m1)]
+                     [l (add-pt coord ccw)]
+                     [r (subtract-pt coord ccw)]
+                     [r+ (cons r so-far)]
+                     [c (shift-pt coord m1 m2)])
+                    (if (root? T)
+                        (cons l
+                          (trace-tree d
+                            (node-branch T)
+                            r+))
+                        (cons l
+                          (trace-tree d
+                            (node-branch1 T)
+                            (cons c
+                              (trace-tree d
+                                (node-branch2 T)
+                                r+))))))))))
+
+;;; There is some slight redundancy in the different behavior between
+;;; roots and non roots in the recursive case above. It could potentially
+;;; be streamlined and generalized by making a helper function that appropriately
+;;; intersperses the 'home coordinates' (e.g. c, l, and r) between a map of recursive
+;;; calls. This would also be the best way to extend this procedure to, e.g., the
+;;; potential bamboo and fern algorithms (but that's a more difficult problem,
+;;; most likely out of scope for our project).
+
+;;; (draw-tree size color n cw ch d ht det1 det2 theta1 theta2 boost) -> drawing?
+;;;    size : nonnegative-integer?
+;;;    color : color?
+;;;    n : positive-integer?
+;;;    cw : nonnegative-integer?
+;;;    ch : nonnegative-integer?
+;;;    d : positive-number?
+;;;    ht : positive-number?
+;;;    det1 : number?
+;;;    det2 : number?
+;;;    theta1 : number?
+;;;    theta2 : number?
+;;;    boost : boolean?
+;;; Returns a drawing that may resemble a tree trunk. This is done by repeatedly
+;;; evolving a base tree with `evolve-tree`, where `ht`, `det1`, `det2`, `theta1`,
+;;; and `theta2` are the respective shift in height, determinants, and angles given
+;;; as parameters to that transformation, and `n` is the number of times it is repeated.
+;;; If `boost` is true, there will be one additional iteration with a determinant of 1
+;;; for both branches. The drawing is then made on a canvas of width `cw` and height `cw`
+;;; with color `color`, via `trace-tree` and `path`. `d` is a parameter given to `trace-tree`
+;;; and controls the branch thickness. `size` is a general multiplier on the size of the
+;;; drawing. 
+(define draw-trunk
+  (lambda (size color n cw ch d ht det1 det2 theta1 theta2 boost)
+    (let* ([new-ht (* size ht)])
+          (|> (root (pair 0 0) (pair 0 1) 1
+                    (node (pair 0 new-ht) 0 2
+                    null))
+              (lambda (T)
+                (if boost
+                    (evolve-tree T new-ht 1 1 theta1 theta2)
+                    T))
+              (lambda (T) 
+                ((apply o
+                  (make-list n
+                    (section evolve-tree _ new-ht
+                             det1 det2 theta1 theta2))) 
+                 T))
+              (section calculate-dir _)
+              (section trace-tree d _ null)
+              (section map (section coord-normal->bad _ cw ch) _)
+              (section path cat cat _ "solid" color)))))
+
 (part "Plants where a basic version exists already, but needs refinement:")
 
 (problem "Sunflower")
@@ -311,50 +576,21 @@
 ;; default sunflower
 (sunflower 100 "orange" "yellow" "darkgreen" "green" "brown" "black")
 
+(problem "Fern")
+
+;;; (fern size color) -> drawing?
+;;;    size : nonnegative-integer?
+;;;    color : color?
+;;; Returns a drawing that somewhat resembles a fern, by calling draw-trunk with some
+;;; specific parameters. `size` controls the size and `color` controls the color. 
+(define fern
+  (lambda (size color)
+    (rotate 0
+      (draw-trunk size color 9 (* 1 size) (* 3 size) 5 0.5 0.55 0.65 1.5 -0.15 #t))))
+
+(fern 400 "green")
+
 (problem "Sakura")
-
-(define echo-pts-shallow
-  (lambda (p1 p2 d)
-    (let* ([v (subtract-pt p2 p1)]
-           [m (/ d (magnitude v))]
-           [m1 (* m (car v))]
-           [m2 (* m (cdr v))]
-           [ccw (pair (* -1 m2) m1)])
-          (list (list (add-pt p1 ccw))
-                (list (subtract-pt p1 ccw))))))
-
-(define echo-pts-deep
-  (lambda (p1 p2 d)
-    (let* ([v (subtract-pt p2 p1)]
-           [m (/ d (magnitude v))]
-           [m1 (* m (car v))]
-           [m2 (* m (cdr v))]
-           [ccw (pair (* -1 m2) m1)])
-          (pair (add-pt p2 ccw)
-                (subtract-pt p2 ccw)))))
-
-(define stitcher
-  (lambda (obj p2 d)
-    (match obj
-      [(cons p1 (cons l1 (cons l2 null)))
-       (let* ([adns (echo-pts-deep p1 p2 d)]
-              [h1 (car adns)]
-              [h2 (cdr adns)])
-             (list p2 (cons h1 l1)
-                      (cons h2 l2)))])))
-
-(define stitch
-  (lambda (l d)
-    (let* ([p1 (car l)]
-           [p2 (car (cdr l))]
-           [sh (echo-pts-shallow p1 p2 d)]
-           [iv (list p1 (car sh) (list-ref sh 1))]
-           [r (fold (section stitcher _ _ d) iv (cdr l))]
-           [l1 (reverse (list-ref r 1))]
-           [l2 (list-ref r 2)])
-          (append l1
-                  l2 
-                  (list (car l1))))))
 
 ;;; (tree-pts so-far n) -> (list-of pair?)
 ;;;    so-far : (list-of pair?)
@@ -507,6 +743,52 @@ hydrangea
 
 (problem "Stem/branch")
 
+;;; old version of the tracing algorithm:
+
+(define echo-pts-shallow
+  (lambda (p1 p2 d)
+    (let* ([v (subtract-pt p2 p1)]
+           [m (/ d (magnitude v))]
+           [m1 (* m (car v))]
+           [m2 (* m (cdr v))]
+           [ccw (pair (* -1 m2) m1)])
+          (list (list (add-pt p1 ccw))
+                (list (subtract-pt p1 ccw))))))
+
+(define echo-pts-deep
+  (lambda (p1 p2 d)
+    (let* ([v (subtract-pt p2 p1)]
+           [m (/ d (magnitude v))]
+           [m1 (* m (car v))]
+           [m2 (* m (cdr v))]
+           [ccw (pair (* -1 m2) m1)])
+          (pair (add-pt p2 ccw)
+                (subtract-pt p2 ccw)))))
+
+(define stitcher
+  (lambda (obj p2 d)
+    (match obj
+      [(cons p1 (cons l1 (cons l2 null)))
+       (let* ([adns (echo-pts-deep p1 p2 d)]
+              [h1 (car adns)]
+              [h2 (cdr adns)])
+             (list p2 (cons h1 l1)
+                      (cons h2 l2)))])))
+
+(define stitch
+  (lambda (l d)
+    (let* ([p1 (car l)]
+           [p2 (car (cdr l))]
+           [sh (echo-pts-shallow p1 p2 d)]
+           [iv (list p1 (car sh) (list-ref sh 1))]
+           [r (fold (section stitcher _ _ d) iv (cdr l))]
+           [l1 (reverse (list-ref r 1))]
+           [l2 (list-ref r 2)])
+          (append l1
+                  l2 
+                  (list (car l1))))))
+
+  
 ;;; These are the points that will make up our first branch.
 ;;; In the future, this should be generalized to remove the "magic numbers".
 ;;; We have the branch roots (BR) and branch ends (BE).
