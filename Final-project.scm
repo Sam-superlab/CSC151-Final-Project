@@ -1104,13 +1104,15 @@
                              (list BE-final origin)) ; redundancy to remove
                      (- n 1))])))
 
-(define stem
-  (|> example-pts
+(define bamboo
+  (lambda (color)
+  (rotate 0 
+    (|> example-pts
       (section branch-pts _ 6)
       (section map (section scale-rotate _ 2 0.9) _)
       (section stitch _ 1)
       (section map (section coord-normal->bad _ 1000 1000) _)
-      (section path 1000 1000 _ "outline" "green")))
+      (section path 1000 1000 _ "outline" color)))))
 
 ; (rotate 0 stem)
 
@@ -1123,8 +1125,6 @@
 
 ;; (description "Rose")
 ; some ideas, but not sure of the best way. 
-
-
 ;; (description "code stored in interactive-plant.scm")
 ;;; (my-canvas-drawing! canvas x y drawing) -> void?
 ;;;    canvas : canvas?
@@ -1151,10 +1151,12 @@
   pot2-plant               ; string, the plant in pot2
   pot3-plant               ; string, the plant in pot3
   water-message-visible?   ; boolean, whether the water message is visible
+  color-options-visible?   ; boolean, whether the color options are displayed
+  selected-color           ; string, the selected color
 ))
 
 ;; Initial state
-(define initial-state (state #f #f "" #f #f "" "" "" "" #f))
+(define initial-state (state #f #f "" #f #f "" "" "" "" #f #f "orange"))
 
 ;; Canvas dimensions
 (define width background-width)
@@ -1168,9 +1170,6 @@
 (define pot3-x  (* 0.66 width))
 (define pot3-y (* 0.68 height))
 
-(define sunflower-drawing (sunflower 60 "orange" "yellow" "darkgreen" "green" "brown" "black"))
-(define daisy-drawing (sunflower 60 "white" "yellow" "darkgreen" "green" "yellow" "black"))
-(define bamboo-drawing (rotate 0 stem))
 
 ;;; (my-button canv x y color text) -> void
 ;;;    canv : canvas
@@ -1204,13 +1203,13 @@
 ;;;    plant : string
 ;;; Draws the specified plant in the pot at the given coordinates.
 (define draw-plant-in-pot
-  (lambda (canv x y plant)
+  (lambda (canv x y plant color)
     (cond
-      [(string=? plant "Sunflower") (my-canvas-drawing! canv x y sunflower-drawing)]
-      [(string=? plant "Fern") (my-canvas-drawing! canv x y (fern 200 "lightgreen"))]
-      [(string=? plant "Sakura") (my-canvas-drawing! canv x y (sakura 200 "pink" "brown"))]
-      [(string=? plant "Pumpkin") (my-canvas-drawing! canv x y (hydrangea 60 "cyan" "violet" "lightgreen"))]
-      [(string=? plant "Bamboo") (my-canvas-drawing! canv x y bamboo-drawing)]
+      [(string=? plant "Sunflower") (my-canvas-drawing! canv x y (sunflower 60 color "yellow" "darkgreen" "green" "brown" "black"))]
+      [(string=? plant "Fern") (my-canvas-drawing! canv x y (fern 200 color))]
+      [(string=? plant "Sakura") (my-canvas-drawing! canv x y (sakura 200 color "brown"))]
+      [(string=? plant "Pumpkin") (my-canvas-drawing! canv x (+ y 200) (hydrangea 60 color "violet" "lightgreen"))]
+      [(string=? plant "Bamboo") (my-canvas-drawing! canv x y (bamboo color))]
       [else #f])))
 
 ;;; (view st canv) -> void
@@ -1220,7 +1219,7 @@
 (define view
   (lambda (st canv)
     (match st
-      [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant water-message-visible?)
+      [(state options-visible? plants-options-visible? selected-plant sunflower-visible? pot-options-visible? selected-pot pot1-plant pot2-plant pot3-plant water-message-visible? color-options-visible? selected-color)
        (begin
          ;; Clear the canvas
          (canvas-drawing! canv 0 0 (generate-background background-height))
@@ -1256,10 +1255,20 @@
              (pot-button canv 915 625 "Pot3"))
            void)
 
+         ;; Render color options if visible
+         (if color-options-visible?
+           (begin
+             (my-button canv 100 300 "pink" "Pink")
+             (my-button canv 100 360 "red" "Red")
+             (my-button canv 100 420 "white" "White")
+             (my-button canv 100 480 "orange" "Orange")
+             (my-button canv 100 540 "lightgreen" "Lightgreen"))
+           void)
+
          ;; Draw the plants in the pots
-         (draw-plant-in-pot canv pot1-x pot1-y pot1-plant)
-         (draw-plant-in-pot canv pot2-x pot2-y pot2-plant)
-         (draw-plant-in-pot canv pot3-x pot3-y pot3-plant)
+         (draw-plant-in-pot canv pot1-x pot1-y pot1-plant selected-color)
+         (draw-plant-in-pot canv pot2-x pot2-y pot2-plant selected-color)
+         (draw-plant-in-pot canv pot3-x pot3-y pot3-plant selected-color)
 
          ;; Render water message if visible
          (if water-message-visible?
@@ -1283,8 +1292,8 @@
               [update-state-field-3
                (lambda (s)
                  (match st
-                   [(state a b c d e f g h i j)
-                    (state a #f s d #t f g h i j)]))]
+                   [(state a b c d e f g h i j k l)
+                    (state a #f s d #t f g h i j k l)]))]
               [pot-selection-helper
                (lambda (s)
                  (and (state-pot-options-visible? st)
@@ -1292,22 +1301,31 @@
               [update-state-field-6
                 (lambda (s n)
                  (match st
-                   [(state a b c d e f g h i j)
+                   [(state a b c d e f g h i j k l)
                     (cond
                       [(= n 1)
-                       (state a b c d #f s c h i #f)]
+                       (state a b c d #f s c h i #f #t l)]
                       [(= n 2)
-                       (state a b c d #f s g c i #f)]
-                      [(= n 3) ; change these to make color options visible
-                       (state a b c d #f s g h c #f)])]))])
+                       (state a b c d #f s g c i #f #t l)]
+                      [(= n 3)
+                       (state a b c d #f s g h c #f #t l)])]))]
+              [color-selection-helper
+               (lambda (c)
+                 (and (state-color-options-visible? st)
+                      (color-clicked? cx cy c)))]
+              [update-state-field-12
+               (lambda (q)
+                 (match st
+                   [(state a b c d e f g h i j k l)
+                    (state a b c d e f g h i j #f q)]))])
              (cond
                ;; Main "Options" button
                [(and (> cx 100) (< cx 200) (> cy 50) (< cy 100))
-                (state (not (state-options-visible? st)) #f (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
+                (state (not (state-options-visible? st)) #f (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f #f (state-selected-color st))]
       
                ;; "Plants" button
                [(and (state-options-visible? st) (> cx 100) (< cx 200) (> cy 150) (< cy 200))
-                (state #t #t (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
+                (state #t #t (state-selected-plant st) (state-sunflower-visible? st) #f (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #f #f (state-selected-color st))]
       
                ;; Plant selection
                [(plant-selection-helper "Sunflower") (update-state-field-3 "Sunflower")]
@@ -1321,11 +1339,18 @@
                [(pot-selection-helper "Pot2") (update-state-field-6 "Pot2" 2)]
                [(pot-selection-helper "Pot3") (update-state-field-6 "Pot3" 3)]
       
+               ;; Color selection
+               [(color-selection-helper "Pink") (update-state-field-12 "pink")]
+               [(color-selection-helper "Red") (update-state-field-12 "red")]
+               [(color-selection-helper "White") (update-state-field-12 "white")]
+               [(color-selection-helper "Orange") (update-state-field-12 "orange")]
+               [(color-selection-helper "Lightgreen") (update-state-field-12 "lightgreen")]
+
                ;; "Water" button
                [(and (state-options-visible? st) (> cx 100) (< cx 200) (> cy 220) (< cy 270))
                 (match st
-                   [(state a b c d e f g h i j)
-                    (state a b c d e f g h i #t)])]
+                   [(state a b c d e f g h i j k l)
+                    (state a b c d e f g h i #t k l)])]
 
                ;; Default: Return current state
                [else st]))]
@@ -1366,6 +1391,26 @@
        (and (> cx 630) (< cx 730) (> cy 600) (< cy 650))]
       [(string=? pot "Pot3")
        (and (> cx 850) (< cx 950) (> cy 600) (< cy 650))]
+      [else #f])))
+
+;;; (color-clicked? cx cy color) -> boolean
+;;;    cx : number
+;;;    cy : number
+;;;    color : string
+;;; Checks if a color button was clicked based on the coordinates.
+(define color-clicked?
+  (lambda (cx cy color)
+    (cond
+      [(string=? color "Pink")
+       (and (> cx 100) (< cx 200) (> cy 300) (< cy 350))]
+      [(string=? color "Red")
+       (and (> cx 100) (< cx 200) (> cy 360) (< cy 410))]
+      [(string=? color "White")
+       (and (> cx 100) (< cx 200) (> cy 420) (< cy 470))]
+      [(string=? color "Orange")
+       (and (> cx 100) (< cx 200) (> cy 480) (< cy 530))]
+      [(string=? color "Lightgreen")
+       (and (> cx 100) (< cx 200) (> cy 540) (< cy 590))]
       [else #f])))
 
 ;;; (reactive-canvas width height initial-state view update on-mouse-click) -> void
