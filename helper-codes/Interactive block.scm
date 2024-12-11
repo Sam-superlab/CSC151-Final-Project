@@ -80,7 +80,7 @@
       [(string=? plant "Sunflower") (my-canvas-drawing! canv x y (sunflower 60 color "yellow" "darkgreen" "green" "brown" "black"))]
       [(string=? plant "Fern") (my-canvas-drawing! canv x y (fern 200 color))]
       [(string=? plant "Sakura") (my-canvas-drawing! canv x y (sakura 200 color "brown"))]
-      [(string=? plant "Pumpkin") (my-canvas-drawing! canv x (+ y 200) (hydrangea 60 color "violet" "lightgreen"))]
+      [(string=? plant "Hydrangea") (my-canvas-drawing! canv x y (hydrangea 60 color "violet" "lightgreen"))]
       [(string=? plant "Bamboo") (my-canvas-drawing! canv x y (bamboo color))]
       [else #f])))
 
@@ -107,7 +107,7 @@
               (my-button canv 0 150 "green" "Sunflower")
               (my-button canv 0 210 "green" "Fern")
               (my-button canv 0 270 "green" "Sakura")
-              (my-button canv 0 330 "green" "Pumpkin")
+              (my-button canv 0 330 "green" "Hydrangea")
               (my-button canv 0 390 "green" "Bamboo"))]
 
            ;; Case: Main options are visible
@@ -203,7 +203,7 @@
                [(plant-selection-helper "Sunflower") (update-state-field-3 "Sunflower")]
                [(plant-selection-helper "Fern") (update-state-field-3 "Fern")]
                [(plant-selection-helper "Sakura") (update-state-field-3 "Sakura")]
-               [(plant-selection-helper "Pumpkin") (update-state-field-3 "Pumpkin")]
+               [(plant-selection-helper "Hydrangea") (update-state-field-3 "Hydrangea")]
                [(plant-selection-helper "Bamboo") (update-state-field-3 "Bamboo")]
 
                ;; Pot selection
@@ -243,7 +243,7 @@
        (and (> cx 0) (< cx 100) (> cy 210) (< cy 260))]
       [(string=? plant "Sakura")
        (and (> cx 0) (< cx 100) (> cy 270) (< cy 320))]
-      [(string=? plant "Pumpkin")
+      [(string=? plant "Hydrangea")
        (and (> cx 0) (< cx 100) (> cy 330) (< cy 380))]
       [(string=? plant "Bamboo")
        (and (> cx 0) (< cx 100) (> cy 390) (< cy 440))]
