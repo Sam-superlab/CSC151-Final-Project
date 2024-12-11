@@ -714,9 +714,6 @@
 
 ;; (part "Individual plants")
 
-;; (problem "Plants which are more or less polished:")
-;; (description "(could potentially add bonus features and details,
-;; and may still need to optimize for interactivity or animation)")
 
 ;; (description "Sunflower")
 
@@ -932,83 +929,14 @@
 
 ;; (hydrangea 60 "blue" "violet" "green")
 
-;; (problem "Plants where a basic version exists already:")
-;; (description "(may need refinement to style or functionality)")
-
-;; (description "Pumpkin")
-
-(define number-of-loops 5)
-(define box-size 400)
-
-(define pumpkin-vector
-  (|> (range 0 6.4 (* 0.01 pi))
-      (section map (lambda (t) 
-                     (list (sin t) t))
-                   _)
-      (section make-vector number-of-loops _)))
-
-(define pumpkin-helper
-  (lambda (l i)
-    (match l
-      [(cons r (cons t null))
-       (list (* 170 (expt r (expt 3 (- i 2)))) t)])))
-
-(define repeat-lighter
-  (lambda (c i)
-    ((apply o (make-list i rgb-lighter)) c)))
-
-(define repeat-darker
-  (lambda (c i)
-    ((apply o (make-list i rgb-darker)) c)))
-
-(define pick-orange
-  (lambda (i)
-    (repeat-lighter (repeat-darker (color-name->rgb "orange") 3) (+ i 1))))
-
-; (begin
-;   (vector-for-each
-;     (lambda (i)
-;       (vector-set! pumpkin-vector i (|> (vector-ref pumpkin-vector i)
-;                                         (section map (section pumpkin-helper _ i) _))))
-;     (vector-range 0 number-of-loops))
-;   (vector-map! (section map (section apply polar->cartesian _) _) pumpkin-vector)
-;   (vector-map! (section map (section coord-normal->bad _ box-size box-size) _) pumpkin-vector)
-;   (vector-for-each
-;     (lambda (i)
-;       (vector-set! pumpkin-vector i (|> (vector-ref pumpkin-vector i)
-;                                         (section path box-size box-size _ "solid" (pick-orange (* 2 i))))))
-;     (vector-range 0 (vector-length pumpkin-vector)))
-;   (|> pumpkin-vector
-;       vector->list
-;       reverse
-;       (section apply overlay _)))
-
-;; (description "Water lily")
-
-(define water-lily
-  (lambda (size color)
-    (|> (range (* -1 size) (+ size 0.01) (* 0.5 size))
-        (section map (section pair size _) _)
-        (section map (lambda (p)
-                       (lambda (t)
-                         (* (magnitude p)
-                            (cos (* 3 (- t (angle1 p))))))) _)
-        (section map (section polar-path-solid _ 0 6.29 0.01
-                                                 (* size 4) (* size 4)
-                                                 color) _)
-        (section apply overlay _)
-        (section rotate 90 _)
-        ; (lambda (img) 
-        ;   (overlay/align "middle" "bottom"
-        ;                  (solid-ellipse (image-width img)
-        ;                                 (* 0.6 (image-height img))
-        ;                                 "green")
-        ;                  img))
-      )))
-
-; (water-lily 10 (rgb 255 0 255 50))
 
 ;; (description "Bamboo")
+;; (description "This code (for Bamboo specifically) is not fully documented or polished,
+; the prior plants are the core of our program.
+; We're keeping it because Sam Ren likes it, don't look at it too hard.")
+
+;;; These procedures are an early version of an algorithm to trace
+;;; around a list of points for thicker branches. 
 
 (define echo-pts-shallow
   (lambda (p1 p2 d)
@@ -1053,8 +981,7 @@
                   l2 
                   (list (car l1))))))
 
-;;; These are the points that will make up our first branch.
-;;; In the future, this should be generalized to remove the "magic numbers".
+;;; These are the points that will make up the initial branch.
 ;;; We have the branch roots (BR) and branch ends (BE).
 (define BR-1 (pair 50 25))
 (define BR-2 (pair 80 40))
@@ -1106,13 +1033,13 @@
                                   so-far)
                              (map (o (section shift-pt _ (car BR-3) (cdr BR-3))
                                      (section scale-rotate _ BL-3f BA-3))
-                                  so-far) ; visually, this looks like there is
-                             (list BE-final origin)) ; redundancy to remove
+                                  so-far) 
+                             (list BE-final origin)) 
                      (- n 1))])))
 
 (define bamboo
   (lambda (color)
-  (rotate 0 
+  (rotate 0 ; exploits rotate's bugs (crops an image)
     (|> example-pts
       (section branch-pts _ 6)
       (section map (section scale-rotate _ 2 0.9) _)
@@ -1122,16 +1049,6 @@
 
 ; (rotate 0 stem)
 
-;; (problem "Plants which could realistically be added")
-;; (description "(should be simple variations of existing plants,
-;; requiring minimal tinkering)")
-
-;; (description "Daisy")
-; should be very similar to sunflower
-
-;; (description "Rose")
-; some ideas, but not sure of the best way. 
-;; (description "code stored in interactive-plant.scm")
 
 ;;; (my-canvas-drawing! canvas x y drawing) -> void?
 ;;;    canvas : canvas?
@@ -1377,10 +1294,10 @@
       ;; Default: Return current state
       [else st])))
 
-;;; (plant-clicked? cx cy plant) -> boolean
-;;;    cx : number
-;;;    cy : number
-;;;    plant : string
+;;; (plant-clicked? cx cy plant) -> boolean?
+;;;    cx : number?
+;;;    cy : number?
+;;;    plant : string?
 ;;; Checks if a plant button was clicked based on the coordinates.
 (define plant-clicked?
   (lambda (cx cy plant)
@@ -1397,10 +1314,10 @@
        (and (> cx 0) (< cx 100) (> cy 390) (< cy 440))]
       [else #f])))
 
-;;; (pot-clicked? cx cy pot) -> boolean
-;;;    cx : number
-;;;    cy : number
-;;;    pot : string
+;;; (pot-clicked? cx cy pot) -> boolean?
+;;;    cx : number?
+;;;    cy : number?
+;;;    pot : string?
 ;;; Checks if a pot button was clicked based on the coordinates.
 (define pot-clicked?
   (lambda (cx cy pot)
@@ -1413,10 +1330,10 @@
        (and (> cx 850) (< cx 950) (> cy 600) (< cy 650))]
       [else #f])))
 
-;;; (color-clicked? cx cy color) -> boolean
-;;;    cx : number
-;;;    cy : number
-;;;    color : string
+;;; (color-clicked? cx cy color) -> boolean?
+;;;    cx : number?
+;;;    cy : number?
+;;;    color : string?
 ;;; Checks if a color button was clicked based on the coordinates.
 (define color-clicked?
   (lambda (cx cy color)
@@ -1433,13 +1350,13 @@
        (and (> cx 100) (< cx 200) (> cy 540) (< cy 590))]
       [else #f])))
 
-;;; (reactive-canvas width height initial-state view update on-mouse-click) -> void
-;;;    width : number
-;;;    height : number
-;;;    initial-state : state
+;;; (reactive-canvas width height initial-state view update on-mouse-click) -> void?
+;;;    width : number?
+;;;    height : number?
+;;;    initial-state : state?
 ;;;    view : (state canvas -> void)
 ;;;    update : (event state -> state)
-;;;    on-mouse-click : event
+;;;    on-mouse-click : event?
 ;;; Creates a reactive canvas with the given dimensions, initial state,
 ;;; view function, update function, and mouse click event subscription.
 (display
