@@ -1178,30 +1178,43 @@
 (define pot3-y (* 0.68 height))
 
 
-;;; (my-button canv x y color text) -> void?
+;;; (my-button-smaller canv x y color text) -> void?
 ;;;    canv : canvas?
 ;;;    x : number?
 ;;;    y : number
 ;;;    color : string?
 ;;;    text : string?
-;;; Draws a button with the given parameters on the canvas.
-(define my-button
+;;; Draws a button with the given parameters on the canvas; used for smaller buttons in application
+(define my-button-smaller
   (lambda (canv x y color text)
     (begin
     (canvas-rectangle! canv x y 100 50 "solid" color)
-    (canvas-text! canv (+ x 15) (+ y 25) text 20 "solid" "black"))))
+    (canvas-text! canv (+ x 6) (+ y 32) text 15 "solid" "black" (font "Montserrat")))))
 
-;;; (pot-button canv x y label) -> void?
+;;; (my-button-main canv x y color text) -> void?
 ;;;    canv : canvas?
 ;;;    x : number?
-;;;    y : number?
-;;;    label : string?
+;;;    y : number
+;;;    color : string?
+;;;    text : string?
+;;; Draws a button with the given parameters on the canvas; used for larger buttons in application
+(define my-button-main
+  (lambda (canv x y color text)
+    (begin
+    (canvas-rectangle! canv x y 100 50 "solid" color)
+    (canvas-text! canv (+ x 8) (+ y 32) text 20 "solid" "black" (font "Montserrat")))))
+
+;;; (pot-button canv x y label) -> void
+;;;    canv : canvas
+;;;    x : number
+;;;    y : number
+;;;    label : string
 ;;; Draws a pot button with the given parameters on the canvas.
 (define pot-button
   (lambda (canv x y label)
     (begin
       (canvas-ellipse! canv x y 50 25 0 0 (* 2 pi) "solid" "brown")
-      (canvas-text! canv (- x 30) y label 20 "solid" "white"))))
+      (canvas-text! canv (- x 25) (+ y 5) label 20 "solid" "white" (font "Montserrat")))))
 
 ;;; (draw-plant-in-pot canv x y plant) -> void?
 ;;;    canv : canvas?
@@ -1232,24 +1245,24 @@
          (canvas-drawing! canv 0 0 (generate-background background-height))
 
          ;; Main "Options" button
-         (my-button canv 100 50 "lightblue" "Options")
+         (my-button-main canv 100 50 "lightblue" "Options")
 
          ;; Render based on visibility
          (cond
            ;; Case: Plants options are visible
            [plants-options-visible?
             (begin
-              (my-button canv 0 150 "green" "Sunflower")
-              (my-button canv 0 210 "green" "Fern")
-              (my-button canv 0 270 "green" "Sakura")
-              (my-button canv 0 330 "green" "Hydrangea")
-              (my-button canv 0 390 "green" "Bamboo"))]
+              (my-button-smaller canv 0 150 "lightpink" "Sunflower")
+              (my-button-smaller canv 0 210 "lightpink" "Fern")
+              (my-button-smaller canv 0 270 "lightpink" "Sakura")
+              (my-button-smaller canv 0 330 "lightpink" "Hydrangea")
+              (my-button-smaller canv 0 390 "lightpink" "Bamboo"))]
 
            ;; Case: Main options are visible
            [options-visible?
             (begin
-              (my-button canv 100 150 "lightgreen" "Plants")
-              (my-button canv 100 220 "lightcoral" "Water"))]
+              (my-button-main canv 100 150 "lightgreen" "Plants")
+              (my-button-main canv 100 220 "lightcoral" "Water"))]
 
            ;; Default case: Do nothing
            [else #f])
@@ -1265,11 +1278,11 @@
          ;; Render color options if visible
          (if color-options-visible?
            (begin
-             (my-button canv 100 300 "pink" "Pink")
-             (my-button canv 100 360 "red" "Red")
-             (my-button canv 100 420 "white" "White")
-             (my-button canv 100 480 "orange" "Orange")
-             (my-button canv 100 540 "lightgreen" "Lightgreen"))
+             (my-button-smaller canv 100 300 "pink" "Pink")
+             (my-button-smaller canv 100 360 "red" "Red")
+             (my-button-smaller canv 100 420 "white" "White")
+             (my-button-smaller canv 100 480 "orange" "Orange")
+             (my-button-smaller canv 100 540 "lightgreen" "Lightgreen"))
            void)
 
          ;; Draw the plants in the pots
@@ -1280,8 +1293,8 @@
          ;; Render water message if visible
          (if water-message-visible?
            (begin
-             (canvas-ellipse! canv 800 200 150 50 0 0 (* 2 pi) "solid" "lightblue")
-             (canvas-text! canv 735 200 "Plants are happy :D" 20 "solid" "black"))void)
+             (canvas-rectangle! canv 525 150 350 100 "solid" "lightyellow")
+             (canvas-text! canv 545 205 "Plants are happy :D" 30 "outline" "forestgreen" (font "Montserrat")))void)
        )])))
 
 ;;; (update msg st) -> state?
