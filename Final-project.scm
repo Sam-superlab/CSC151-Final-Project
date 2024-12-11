@@ -1,7 +1,7 @@
 ;; -----------------------------------------------------------------------------
 ;; CSC 151 - Functional Problem Solving (Final Project)
 ;; File: final-project.scm
-;; Authors: Xuyi(Sam) Ren, Hassan, Jonathan Gaynor, Ari Johnson, Sam Hopkins
+;; Authors: Xuyi (Sam) Ren, Hassan, Jonathan Gaynor, Ari Johnson, Sam Hopkins
 ;; Date: 13th December 2024
 ;; -----------------------------------------------------------------------------
 ;; Overview:
@@ -11,18 +11,23 @@
 ;; and multimedia manipulation, including images, and interactivity.
 ;;
 ;; Features:
-;; - Generate a background image
+;; - Generate a background image.
 ;; - Create individual plant images with varying shapes and colors.
-;; - Implement an interactive plant that grows when clicked.
+;; - Implement interactive plants that can be "watered".
 ;;
-;; File Structure:
+;; File Structure (on github):
 ;; - generate-background.scm: Code to generate a background image.
 ;; - individual-plants-v1.scm: Code to create individual plant images.
 ;; - interactive-plant.scm: Code to implement an interactive plant.
+
 ;; Acknowledgments:
-;; - Grinnell College CSC 151 instructional team for guidance and starter code.
-;; - Group members for collaboration and problem-solving.
-;; - Additional inspirations or references (if any).
+;; - Thanks to the Grinnell College CSC 151 instructional team 
+;;   for their guidance and support:
+;;    * Owen Block for help in mentor sessions
+;;    * PM Osera for help over teams
+;;    * Ethan Hughes for help in evening tutor sessions
+;; - Assignment instructions available at the following:
+;;   https://osera.cs.grinnell.edu/csc151/readings/the-final-project.html
 ;; -----------------------------------------------------------------------------
 
 
