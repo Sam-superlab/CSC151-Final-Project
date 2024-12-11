@@ -1126,7 +1126,6 @@
 
 
 ;; (description "code stored in interactive-plant.scm")
-
 ;;; (my-canvas-drawing! canvas x y drawing) -> void?
 ;;;    canvas : canvas?
 ;;;    x : nonnegative-integer?
@@ -1208,9 +1207,9 @@
   (lambda (canv x y plant)
     (cond
       [(string=? plant "Sunflower") (my-canvas-drawing! canv x y sunflower-drawing)]
-      [(string=? plant "Daisy") (my-canvas-drawing! canv x y daisy-drawing)]
-      [(string=? plant "Sakura") (my-canvas-drawing! canv x y sakura)]
-      [(string=? plant "Pumpkin") (my-canvas-drawing! canv x (+ y 200) pumpkin)]
+      [(string=? plant "Fern") (my-canvas-drawing! canv x y (fern 200 "lightgreen"))]
+      [(string=? plant "Sakura") (my-canvas-drawing! canv x y (sakura 200 "pink" "brown"))]
+      [(string=? plant "Pumpkin") (my-canvas-drawing! canv x y (hydrangea 60 "cyan" "violet" "lightgreen"))]
       [(string=? plant "Bamboo") (my-canvas-drawing! canv x y bamboo-drawing)]
       [else #f])))
 
@@ -1235,7 +1234,7 @@
            [plants-options-visible?
             (begin
               (my-button canv 0 150 "green" "Sunflower")
-              (my-button canv 0 210 "green" "Daisy")
+              (my-button canv 0 210 "green" "Fern")
               (my-button canv 0 270 "green" "Sakura")
               (my-button canv 0 330 "green" "Pumpkin")
               (my-button canv 0 390 "green" "Bamboo"))]
@@ -1285,7 +1284,22 @@
                (lambda (s)
                  (match st
                    [(state a b c d e f g h i j)
-                    (state a #f s d #t f g h i j)]))])
+                    (state a #f s d #t f g h i j)]))]
+              [pot-selection-helper
+               (lambda (s)
+                 (and (state-pot-options-visible? st)
+                      (pot-clicked? cx cy s)))]
+              [update-state-field-6
+                (lambda (s n)
+                 (match st
+                   [(state a b c d e f g h i j)
+                    (cond
+                      [(= n 1)
+                       (state a b c d #f s c h i #f)]
+                      [(= n 2)
+                       (state a b c d #f s g c i #f)]
+                      [(= n 3) ; change these to make color options visible
+                       (state a b c d #f s g h c #f)])]))])
              (cond
                ;; Main "Options" button
                [(and (> cx 100) (< cx 200) (> cy 50) (< cy 100))
@@ -1297,20 +1311,22 @@
       
                ;; Plant selection
                [(plant-selection-helper "Sunflower") (update-state-field-3 "Sunflower")]
-               [(plant-selection-helper "Daisy") (update-state-field-3 "Daisy")]
+               [(plant-selection-helper "Fern") (update-state-field-3 "Fern")]
                [(plant-selection-helper "Sakura") (update-state-field-3 "Sakura")]
                [(plant-selection-helper "Pumpkin") (update-state-field-3 "Pumpkin")]
                [(plant-selection-helper "Bamboo") (update-state-field-3 "Bamboo")]
 
                ;; Pot selection
-               [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot1")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot1" (state-selected-plant st) (state-pot2-plant st) (state-pot3-plant st) #f)]
-               [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot2")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot2" (state-pot1-plant st) (state-selected-plant st) (state-pot3-plant st) #f)]
-               [(and (state-pot-options-visible? st) (pot-clicked? cx cy "Pot3")) (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) #f "Pot3" (state-pot1-plant st) (state-pot2-plant st) (state-selected-plant st) #f)]
+               [(pot-selection-helper "Pot1") (update-state-field-6 "Pot1" 1)]
+               [(pot-selection-helper "Pot2") (update-state-field-6 "Pot2" 2)]
+               [(pot-selection-helper "Pot3") (update-state-field-6 "Pot3" 3)]
       
                ;; "Water" button
                [(and (state-options-visible? st) (> cx 100) (< cx 200) (> cy 220) (< cy 270))
-                (state (state-options-visible? st) (state-plants-options-visible? st) (state-selected-plant st) (state-sunflower-visible? st) (state-pot-options-visible? st) (state-selected-pot st) (state-pot1-plant st) (state-pot2-plant st) (state-pot3-plant st) #t)]
-      
+                (match st
+                   [(state a b c d e f g h i j)
+                    (state a b c d e f g h i #t)])]
+
                ;; Default: Return current state
                [else st]))]
       ;; Default: Return current state
@@ -1326,7 +1342,7 @@
     (cond
       [(string=? plant "Sunflower")
        (and (> cx 0) (< cx 100) (> cy 150) (< cy 200))]
-      [(string=? plant "Daisy")
+      [(string=? plant "Fern")
        (and (> cx 0) (< cx 100) (> cy 210) (< cy 260))]
       [(string=? plant "Sakura")
        (and (> cx 0) (< cx 100) (> cy 270) (< cy 320))]
