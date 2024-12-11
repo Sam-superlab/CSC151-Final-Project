@@ -550,7 +550,8 @@
 ;;; (tree->list T min-depth) -> list?
 ;;;    T : tree?
 ;;;    min-depth : positive-integer?
-;;; Returns a list of the coord fields contained in `T`.
+;;; Returns a list of the coord fields contained in `T`. Nodes whose depth
+;;; fields to not meet `min-depth` are excluded.
 (define tree->list
   (lambda (T min-depth)
     (match T
@@ -623,7 +624,7 @@
                branches))]
       [_ (error "calculate-dir expected a tree, received something else")])))
 
-;;; (trace-tree T) -> (list-of pair?)
+;;; (trace-tree T d so-far) -> (list-of pair?)
 ;;;    T : node?
 ;;;    d : positive-number?
 ;;;    so-far : (list-of pair?)
@@ -1177,12 +1178,12 @@
 (define pot3-y (* 0.68 height))
 
 
-;;; (my-button canv x y color text) -> void
-;;;    canv : canvas
-;;;    x : number
+;;; (my-button canv x y color text) -> void?
+;;;    canv : canvas?
+;;;    x : number?
 ;;;    y : number
-;;;    color : string
-;;;    text : string
+;;;    color : string?
+;;;    text : string?
 ;;; Draws a button with the given parameters on the canvas.
 (define my-button
   (lambda (canv x y color text)
@@ -1190,11 +1191,11 @@
     (canvas-rectangle! canv x y 100 50 "solid" color)
     (canvas-text! canv (+ x 15) (+ y 25) text 20 "solid" "black"))))
 
-;;; (pot-button canv x y label) -> void
-;;;    canv : canvas
-;;;    x : number
-;;;    y : number
-;;;    label : string
+;;; (pot-button canv x y label) -> void?
+;;;    canv : canvas?
+;;;    x : number?
+;;;    y : number?
+;;;    label : string?
 ;;; Draws a pot button with the given parameters on the canvas.
 (define pot-button
   (lambda (canv x y label)
@@ -1202,11 +1203,11 @@
       (canvas-ellipse! canv x y 50 25 0 0 (* 2 pi) "solid" "brown")
       (canvas-text! canv (- x 30) y label 20 "solid" "white"))))
 
-;;; (draw-plant-in-pot canv x y plant) -> void
-;;;    canv : canvas
-;;;    x : number
-;;;    y : number
-;;;    plant : string
+;;; (draw-plant-in-pot canv x y plant) -> void?
+;;;    canv : canvas?
+;;;    x : number?
+;;;    y : number?
+;;;    plant : string?
 ;;; Draws the specified plant in the pot at the given coordinates.
 (define draw-plant-in-pot
   (lambda (canv x y plant color)
@@ -1283,9 +1284,9 @@
              (canvas-text! canv 735 200 "Plants are happy :D" 20 "solid" "black"))void)
        )])))
 
-;;; (update msg st) -> state
-;;;    msg : event
-;;;    st : state
+;;; (update msg st) -> state?
+;;;    msg : event?
+;;;    st : state?
 ;;; Updates the state based on the event message.
 (define update
   (lambda (msg st)
