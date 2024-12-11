@@ -1,68 +1,63 @@
-faf75fd,johnsona6,26 minutes ago,Update Final-project.scm
-04cf3f6,hopkinss2,2 hours ago,Update Final-project.scm
-4adeb8e,hopkinss2,2 hours ago,Update Final-project.scm
-0a02513,Sam Ren,2 hours ago,Enhance Final-project.scm: implement dynamic plant and color selection with updated state management and rendering logic
-b9be138,Sam Ren,2 hours ago,Update Interactive block.scm: replace "Pumpkin" with "Hydrangea" in plant selection and drawing logic
-be44874,johnsona6,5 hours ago,Update Final-project.scm
-6ba9b32,Sam Ren,10 hours ago,Enhance Interactive block.scm: add color selection functionality and update plant drawing logic to support dynamic colors
-e61011e,Sam Ren,11 hours ago,Update Final-project.scm: replace "Daisy" with "Fern" and adjust drawing functions for plant selections
-5588c73,Sam Ren,12 hours ago,Refactor Interactive block.scm: remove unused imports, simplify draw-plant-in-pot function, and clean up state management
-8511a4f,hopkinss2,12 hours ago,Update Final-project.scm
-7a7c24e,hopkinss2,12 hours ago,Update Final-project.scm
-c6cbfa5,hopkinss2,12 hours ago,Update Final-project.scm
-c728b77,hopkinss2,12 hours ago,Update Final-project.scm
-327a750,hopkinss2,13 hours ago,Add files via upload
-229f716,Sam Ren,13 hours ago,feat: Enhance interactive canvas with new flower types and improved rendering performance
-e189b27,hopkinss2,13 hours ago,Add files via upload
-962dd4e,Sam Ren,14 hours ago,feat: Add color options for sunflower and update state management in interactive canvas
-6770f24,johnsona6,16 hours ago,Create animation
-d4bb73f,Sam Ren,17 hours ago,feat: Refactor drawing functions and add pot button functionality in interactive canvas
-598d435,hopkinss2,19 hours ago,Update Interactive block.scm
-116132a,hopkinss2,23 hours ago,Update individual-plants-v1.scm
-0159d6c,johnsona6,2 days ago,Update Final-project.scm
-7743bba,Sam Ren,2 days ago,feat: Add detailed documentation for view, update, and helper functions in the interactive canvas
-5c8f45e,Sam Ren,2 days ago,feat: Add water message visibility and update state structure in interactive canvas
-ec6df3e,Sam Ren,2 days ago,feat: Refactor interactive canvas for improved performance and responsiveness
-3d55a05,Sam Ren,2 days ago,Gather all code into final-project.scm
-97a6b67,Sam Ren,2 days ago,feat: Remove unused section1 and section4 helper files
-adeb1cb,Sam Ren,2 days ago,feat: Add HTML import to Interactive block and remove unused section2 file
-f0d9751,Sam Ren,2 days ago,feat: Enhance interactive canvas with new plant customization features
-930df34,Sam Ren,2 days ago,Decompose view function
-96b5bbf,Sam Ren,2 days ago,feat: Implement plant drawing and rendering options on the interactive canvas
-28061b0,Sam Ren,2 days ago,feat: Add configurable sunflower drawing functions with customizable colors and sizes
-2007e82,Sam Ren,2 days ago,feat: Update pot selection visuals to use ellipses instead of rectangles
-992f047,Sam Ren,3 days ago,docs: Update README for clarity and formatting improvements
-5db2256,Sam Ren,3 days ago,feat: Enhance interactive canvas with plants and pots selection logic
-af5fe72,frog-gichur,3 days ago,growing-function.scm
-20d70a4,hopkinss2,3 days ago,Update individual-plants-v1.scm
-9eb32f5,Sam Ren,3 days ago,update the interactivity blocl
-aba0f5c,Sam Ren,3 days ago,Add background generation function and update canvas rendering
-e20af66,hopkinss2,4 days ago,Add files via upload
-3ce70cf,Sam Ren,4 days ago,Add interactive plant selection with unique drawings and larger canvas
-18e2fd5,Sam Ren,4 days ago,Refactor interactive canvas: Simplify state management and enhance rendering logic
-a437c08,Sam Ren,4 days ago,Enhance interactive canvas: Add plant selection options and update state management
-caa756b,Sam Ren,7 days ago,Refactor canvas interactivity: Move state management and rendering logic to a new file
-304d5a0,hopkinss2,8 days ago,Add files via upload
-c235f7a,Sam Ren,8 days ago,Enhance canvas interactivity: Add size and pattern options to state management and rendering
-cf10406,Sam Ren,8 days ago,Enhance interactive canvas: Add color options and update state management
-103e183,Sam Ren,9 days ago,Refactor interactivity logic: Replace static canvas handling with reactive programming
-9fb2b43,Sam Ren,2 weeks ago,Add interactive options to canvas with dynamic buttons and input handling
-5a8ff97,Sam Ren,3 weeks ago,Update instructions
-45ac0b8,Sam Ren,3 weeks ago,Update summary of project ourline in readme.md
-6de0440,Sam Ren,3 weeks ago,update documetnations
-27cee7e,Sam Ren,3 weeks ago,update codes and documentations of sections
-ae31cb1,SSam,4 weeks ago,Update helper functions (#7)
-9ac67c8,SSam,4 weeks ago,Merge pull request #6 from Sam-superlab/Sam-branch
-d7f049b,Sam Ren,4 weeks ago,update documentations for final-project
-5c9b83e,SSam,4 weeks ago,Merge pull request #4 from Sam-superlab/main
-aa694e2,SSam,4 weeks ago,Merge pull request #3 from Sam-superlab/Sam-branch
-e78abaa,Sam Ren,4 weeks ago,update
-6687a81,SSam,4 weeks ago,Merge pull request #2 from Sam-superlab/Sam-branch
-157c15d,Sam Ren,4 weeks ago,update readme.md
-0888ceb,SSam,4 weeks ago,Merge pull request #1 from Sam-superlab/main
-c6124eb,SSam,4 weeks ago,Update README.md
-dfc2437,SSam,4 weeks ago,Update README.md
-8eacf14,Sam Ren,4 weeks ago,Add read me file
-04f0ab8,Sam Ren,4 weeks ago,create instuctions use git in readme.md
-9344424,Sam Ren,4 weeks ago,create inital files that helps the final project
-0ee5954,SSam,4 weeks ago,Initial commit
+"faf75fd","johnsona6","Wed, 11 Dec 2024 09:45:18 -0600","Update Final-project.scm",	 1 file changed, 36 insertions(+), 23 deletions(-)	
+"04cf3f6","hopkinss2","Wed, 11 Dec 2024 08:15:56 -0600","Update Final-project.scm",	 1 file changed, 21 insertions(+), 20 deletions(-)	
+"4adeb8e","hopkinss2","Wed, 11 Dec 2024 08:13:00 -0600","Update Final-project.scm",	 1 file changed, 12 insertions(+), 7 deletions(-)	
+"0a02513","Sam Ren","Wed, 11 Dec 2024 08:01:00 -0600","Enhance Final-project.scm: implement dynamic plant and color selection with updated state management and rendering logic",	 1 file changed, 303 insertions(+), 1 deletion(-)	
+"b9be138","Sam Ren","Wed, 11 Dec 2024 07:59:46 -0600","Update Interactive block.scm: replace "Pumpkin" with "Hydrangea" in plant selection and drawing logic",	 2 files changed, 6 insertions(+), 315 deletions(-)	
+"be44874","johnsona6","Wed, 11 Dec 2024 05:32:58 -0600","Update Final-project.scm",	 1 file changed, 26 insertions(+), 18 deletions(-)	
+"6ba9b32","Sam Ren","Wed, 11 Dec 2024 00:08:03 -0600","Enhance Interactive block.scm: add color selection functionality and update plant drawing logic to support dynamic colors",	 2 files changed, 146 insertions(+), 53 deletions(-)	
+"e61011e","Sam Ren","Tue, 10 Dec 2024 23:25:39 -0600","Update Final-project.scm: replace "Daisy" with "Fern" and adjust drawing functions for plant selections",	 2 files changed, 88 insertions(+), 50 deletions(-)	
+"5588c73","Sam Ren","Tue, 10 Dec 2024 22:35:04 -0600","Refactor Interactive block.scm: remove unused imports, simplify draw-plant-in-pot function, and clean up state management",	 1 file changed, 21 insertions(+), 53 deletions(-)	
+"8511a4f","hopkinss2","Tue, 10 Dec 2024 22:34:03 -0600","Update Final-project.scm",	 1 file changed, 36 insertions(+), 27 deletions(-)	
+"7a7c24e","hopkinss2","Tue, 10 Dec 2024 21:53:57 -0600","Update Final-project.scm",	 1 file changed, 27 insertions(+), 27 deletions(-)	
+"c6cbfa5","hopkinss2","Tue, 10 Dec 2024 21:50:37 -0600","Update Final-project.scm",	 1 file changed, 5 insertions(+), 5 deletions(-)	
+"c728b77","hopkinss2","Tue, 10 Dec 2024 21:47:00 -0600","Update Final-project.scm",	 1 file changed, 566 insertions(+), 142 deletions(-)	
+"327a750","hopkinss2","Tue, 10 Dec 2024 21:40:03 -0600","Add files via upload",	 1 file changed, 1093 insertions(+)	
+"229f716","Sam Ren","Tue, 10 Dec 2024 21:38:46 -0600","feat: Enhance interactive canvas with new flower types and improved rendering performance",	 1 file changed, 1093 deletions(-)	
+"e189b27","hopkinss2","Tue, 10 Dec 2024 21:36:55 -0600","Add files via upload",	 1 file changed, 1093 insertions(+)	
+"962dd4e","Sam Ren","Tue, 10 Dec 2024 20:16:25 -0600","feat: Add color options for sunflower and update state management in interactive canvas",	 1 file changed, 47 insertions(+), 20 deletions(-)	
+"6770f24","johnsona6","Tue, 10 Dec 2024 18:26:05 -0600","Create animation",	 1 file changed, 155 insertions(+)	
+"d4bb73f","Sam Ren","Tue, 10 Dec 2024 17:15:47 -0600","feat: Refactor drawing functions and add pot button functionality in interactive canvas",	 2 files changed, 217 insertions(+), 155 deletions(-)	
+"598d435","hopkinss2","Tue, 10 Dec 2024 15:33:41 -0600","Update Interactive block.scm",	 1 file changed, 13 insertions(+)	
+"116132a","hopkinss2","Tue, 10 Dec 2024 11:09:51 -0600","Update individual-plants-v1.scm",	 1 file changed, 323 insertions(+), 41 deletions(-)	
+"0159d6c","johnsona6","Mon, 9 Dec 2024 22:32:04 -0600","Update Final-project.scm",	 1 file changed, 16 insertions(+), 13 deletions(-)	
+"7743bba","Sam Ren","Mon, 9 Dec 2024 19:32:14 -0600","feat: Add detailed documentation for view, update, and helper functions in the interactive canvas",	 2 files changed, 55 insertions(+), 21 deletions(-)	
+"5c8f45e","Sam Ren","Mon, 9 Dec 2024 19:21:47 -0600","feat: Add water message visibility and update state structure in interactive canvas",	 1 file changed, 30 insertions(+), 19 deletions(-)	
+"ec6df3e","Sam Ren","Mon, 9 Dec 2024 19:21:34 -0600","feat: Refactor interactive canvas for improved performance and responsiveness",	 1 file changed, 25 insertions(+), 701 deletions(-)	
+"3d55a05","Sam Ren","Mon, 9 Dec 2024 19:15:03 -0600","Gather all code into final-project.scm",	 1 file changed, 826 insertions(+), 20 deletions(-)	
+"97a6b67","Sam Ren","Mon, 9 Dec 2024 19:09:48 -0600","feat: Remove unused section1 and section4 helper files",	 3 files changed, 132 deletions(-)	
+"adeb1cb","Sam Ren","Mon, 9 Dec 2024 19:08:58 -0600","feat: Add HTML import to Interactive block and remove unused section2 file",	 2 files changed, 1 insertion(+), 3 deletions(-)	
+"f0d9751","Sam Ren","Mon, 9 Dec 2024 18:44:40 -0600","feat: Enhance interactive canvas with new plant customization features",	 1 file changed, 247 insertions(+), 133 deletions(-)	
+"930df34","Sam Ren","Mon, 9 Dec 2024 16:50:18 -0600","Decompose view function",	 1 file changed, 45 insertions(+), 16 deletions(-)	
+"96b5bbf","Sam Ren","Mon, 9 Dec 2024 16:33:25 -0600","feat: Implement plant drawing and rendering options on the interactive canvas",	 1 file changed, 97 insertions(+), 75 deletions(-)	
+"28061b0","Sam Ren","Mon, 9 Dec 2024 10:32:54 -0600","feat: Add configurable sunflower drawing functions with customizable colors and sizes",	 1 file changed, 82 insertions(+), 52 deletions(-)	
+"2007e82","Sam Ren","Mon, 9 Dec 2024 10:19:16 -0600","feat: Update pot selection visuals to use ellipses instead of rectangles",	 1 file changed, 6 insertions(+), 6 deletions(-)	
+"992f047","Sam Ren","Sun, 8 Dec 2024 22:00:46 -0600","docs: Update README for clarity and formatting improvements",	 1 file changed, 25 insertions(+), 27 deletions(-)	
+"5db2256","Sam Ren","Sun, 8 Dec 2024 21:55:45 -0600","feat: Enhance interactive canvas with plants and pots selection logic",	 1 file changed, 67 insertions(+), 20 deletions(-)	
+"af5fe72","frog-gichur","Sun, 8 Dec 2024 21:55:31 -0600","growing-function.scm",	 1 file changed, 156 insertions(+)	
+"20d70a4","hopkinss2","Sun, 8 Dec 2024 19:25:02 -0600","Update individual-plants-v1.scm",	 1 file changed, 79 insertions(+), 17 deletions(-)	
+"9eb32f5","Sam Ren","Sun, 8 Dec 2024 19:02:02 -0600","update the interactivity blocl",	 1 file changed, 42 insertions(+), 42 deletions(-)	
+"aba0f5c","Sam Ren","Sun, 8 Dec 2024 17:40:59 -0600","Add background generation function and update canvas rendering",	 1 file changed, 149 insertions(+), 1 deletion(-)	
+"e20af66","hopkinss2","Sat, 7 Dec 2024 20:05:58 -0600","Add files via upload",	 1 file changed, 136 insertions(+)	
+"3ce70cf","Sam Ren","Sat, 7 Dec 2024 17:17:40 -0600","Add interactive plant selection with unique drawings and larger canvas",	 1 file changed, 360 insertions(+), 17 deletions(-)	
+"18e2fd5","Sam Ren","Sat, 7 Dec 2024 16:47:08 -0600","Refactor interactive canvas: Simplify state management and enhance rendering logic",	 1 file changed, 109 insertions(+), 150 deletions(-)	
+"a437c08","Sam Ren","Sat, 7 Dec 2024 16:06:31 -0600","Enhance interactive canvas: Add plant selection options and update state management",	 1 file changed, 149 insertions(+), 133 deletions(-)	
+"caa756b","Sam Ren","Wed, 4 Dec 2024 10:54:33 -0600","Refactor canvas interactivity: Move state management and rendering logic to a new file",	 1 file changed, 0 insertions(+), 0 deletions(-)	
+"304d5a0","hopkinss2","Tue, 3 Dec 2024 20:44:36 -0600","Add files via upload",	 1 file changed, 524 insertions(+)	
+"c235f7a","Sam Ren","Tue, 3 Dec 2024 18:56:41 -0600","Enhance canvas interactivity: Add size and pattern options to state management and rendering",	 1 file changed, 90 insertions(+), 37 deletions(-)	
+"cf10406","Sam Ren","Tue, 3 Dec 2024 10:02:26 -0600","Enhance interactive canvas: Add color options and update state management",	 2 files changed, 76 insertions(+), 18 deletions(-)	
+"103e183","Sam Ren","Mon, 2 Dec 2024 22:25:47 -0600","Refactor interactivity logic: Replace static canvas handling with reactive programming",	 1 file changed, 54 insertions(+), 69 deletions(-)	
+"9fb2b43","Sam Ren","Tue, 26 Nov 2024 15:54:41 -0600","Add interactive options to canvas with dynamic buttons and input handling",	 1 file changed, 70 insertions(+)	
+"5a8ff97","Sam Ren","Fri, 22 Nov 2024 11:00:37 -0600","Update instructions",	 1 file changed, 3 insertions(+), 3 deletions(-)	
+"45ac0b8","Sam Ren","Fri, 22 Nov 2024 10:37:48 -0600","Update summary of project ourline in readme.md",	 2 files changed, 23 insertions(+), 21 deletions(-)	
+"6de0440","Sam Ren","Sun, 17 Nov 2024 13:20:43 -0600","update documetnations",	 2 files changed, 5 insertions(+), 1 deletion(-)	
+"27cee7e","Sam Ren","Sun, 17 Nov 2024 13:20:30 -0600","update codes and documentations of sections",	 1 file changed, 29 insertions(+), 1 deletion(-)	
+"ae31cb1","SSam","Fri, 15 Nov 2024 16:34:58 -0600","Update helper functions (#7)",	 5 files changed, 132 insertions(+), 1 deletion(-)	
+"d7f049b","Sam Ren","Fri, 15 Nov 2024 15:40:40 -0600","update documentations for final-project",	 1 file changed, 53 insertions(+)	
+"e78abaa","Sam Ren","Fri, 15 Nov 2024 14:49:06 -0600","update",	 1 file changed, 17 insertions(+), 20 deletions(-)	
+"157c15d","Sam Ren","Fri, 15 Nov 2024 14:37:39 -0600","update readme.md",	 1 file changed, 29 insertions(+), 1 deletion(-)	
+"c6124eb","SSam","Sat, 16 Nov 2024 04:24:00 +0800","Update README.md",	 1 file changed, 1 insertion(+), 1 deletion(-)	
+"dfc2437","SSam","Sat, 16 Nov 2024 04:19:20 +0800","Update README.md",	 1 file changed, 1 insertion(+), 1 deletion(-)	
+"8eacf14","Sam Ren","Fri, 15 Nov 2024 10:51:22 -0600","Add read me file",	 1 file changed, 17 insertions(+), 77 deletions(-)	
+"04f0ab8","Sam Ren","Fri, 15 Nov 2024 10:37:38 -0600","create instuctions use git in readme.md",	 1 file changed, 87 insertions(+)	
+"9344424","Sam Ren","Fri, 15 Nov 2024 10:33:50 -0600","create inital files that helps the final project",	 3 files changed, 2 deletions(-)	
+"0ee5954","SSam","Sat, 16 Nov 2024 00:22:08 +0800","Initial commit",	 1 file changed, 2 insertions(+)	

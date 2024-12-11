@@ -1,0 +1,83 @@
+* faf75fd Update Final-project.scm
+* 04cf3f6 Update Final-project.scm
+* 4adeb8e Update Final-project.scm
+* 0a02513 Enhance Final-project.scm: implement dynamic plant and color selection with updated state management and rendering logic
+* b9be138 Update Interactive block.scm: replace "Pumpkin" with "Hydrangea" in plant selection and drawing logic
+* be44874 Update Final-project.scm
+* 6ba9b32 Enhance Interactive block.scm: add color selection functionality and update plant drawing logic to support dynamic colors
+* e61011e Update Final-project.scm: replace "Daisy" with "Fern" and adjust drawing functions for plant selections
+* 5588c73 Refactor Interactive block.scm: remove unused imports, simplify draw-plant-in-pot function, and clean up state management
+* 8511a4f Update Final-project.scm
+* 7a7c24e Update Final-project.scm
+* c6cbfa5 Update Final-project.scm
+* c728b77 Update Final-project.scm
+* 327a750 Add files via upload
+* 229f716 feat: Enhance interactive canvas with new flower types and improved rendering performance
+* e189b27 Add files via upload
+* 962dd4e feat: Add color options for sunflower and update state management in interactive canvas
+* 6770f24 Create animation
+* d4bb73f feat: Refactor drawing functions and add pot button functionality in interactive canvas
+* 598d435 Update Interactive block.scm
+* 116132a Update individual-plants-v1.scm
+* 0159d6c Update Final-project.scm
+* 7743bba feat: Add detailed documentation for view, update, and helper functions in the interactive canvas
+* 5c8f45e feat: Add water message visibility and update state structure in interactive canvas
+* ec6df3e feat: Refactor interactive canvas for improved performance and responsiveness
+* 3d55a05 Gather all code into final-project.scm
+* 97a6b67 feat: Remove unused section1 and section4 helper files
+* adeb1cb feat: Add HTML import to Interactive block and remove unused section2 file
+* f0d9751 feat: Enhance interactive canvas with new plant customization features
+* 930df34 Decompose view function
+* 96b5bbf feat: Implement plant drawing and rendering options on the interactive canvas
+* 28061b0 feat: Add configurable sunflower drawing functions with customizable colors and sizes
+* 2007e82 feat: Update pot selection visuals to use ellipses instead of rectangles
+* 992f047 docs: Update README for clarity and formatting improvements
+* 5db2256 feat: Enhance interactive canvas with plants and pots selection logic
+* af5fe72 growing-function.scm
+* 20d70a4 Update individual-plants-v1.scm
+* 9eb32f5 update the interactivity blocl
+* aba0f5c Add background generation function and update canvas rendering
+* e20af66 Add files via upload
+* 3ce70cf Add interactive plant selection with unique drawings and larger canvas
+* 18e2fd5 Refactor interactive canvas: Simplify state management and enhance rendering logic
+* a437c08 Enhance interactive canvas: Add plant selection options and update state management
+* caa756b Refactor canvas interactivity: Move state management and rendering logic to a new file
+* 304d5a0 Add files via upload
+* c235f7a Enhance canvas interactivity: Add size and pattern options to state management and rendering
+* cf10406 Enhance interactive canvas: Add color options and update state management
+* 103e183 Refactor interactivity logic: Replace static canvas handling with reactive programming
+* 9fb2b43 Add interactive options to canvas with dynamic buttons and input handling
+* 5a8ff97 Update instructions
+* 45ac0b8 Update summary of project ourline in readme.md
+* 6de0440 update documetnations
+* 27cee7e update codes and documentations of sections
+| * 6eeaad8 Update test.scm
+| * 2759fe5 ( just for testting the git )
+| * a3bacf2 (i tested the git no changes at all
+|/  
+* ae31cb1 Update helper functions (#7)
+*   9ac67c8 Merge pull request #6 from Sam-superlab/Sam-branch
+|\  
+| *   5c9b83e Merge pull request #4 from Sam-superlab/main
+| |\  
+| | *   aa694e2 Merge pull request #3 from Sam-superlab/Sam-branch
+| | |\  
+| | |/  
+| |/|   
+| * | e78abaa update
+| | *   6687a81 Merge pull request #2 from Sam-superlab/Sam-branch
+| | |\  
+| | |/  
+| |/|   
+| * | 157c15d update readme.md
+| * | 0888ceb Merge pull request #1 from Sam-superlab/main
+| |\| 
+| | * c6124eb Update README.md
+| | * dfc2437 Update README.md
+| |/  
+* / d7f049b update documentations for final-project
+|/  
+* 8eacf14 Add read me file
+* 04f0ab8 create instuctions use git in readme.md
+* 9344424 create inital files that helps the final project
+* 0ee5954 Initial commit
