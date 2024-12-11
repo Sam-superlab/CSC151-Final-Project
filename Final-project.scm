@@ -138,25 +138,25 @@
             (lambda (n color)
               (solid-ellipse (* 0.8 n) (* 0.2 n) color))]
            [ps ;pot size
-            (* s 0.4)]
+            (* s 0.3)]
            [empty-pot
             (overlay/align "middle" "top"
-              (overlay (make-pot-rim (* ps 0.85) (c 9))
+              (overlay (make-pot-rim (* s 0.27) (c 9))
                        (make-pot-rim ps (c 10)))
               (overlay/align "middle" "bottom"
-                (overlay (make-pot-base (* ps 0.9) (c 9))
+                (overlay (make-pot-base (* s 0.29) (c 9))
                          (make-pot-base ps (c 10)))
                 (solid-rectangle ps (* 1.1 ps) (c 11))))]
            [spacer2
             (solid-square (* s 0.0085) (c 11))]
            [dirt
-            (make-pot-rim (* ps 0.78) (c 8))]
+            (make-pot-rim (* s 0.25) (c 8))]
            [pot
             (overlay/align "middle" "top" 
                            (above spacer2 dirt) 
                            empty-pot)]
            [pots 
-            (above (beside pot spacer pot spacer pot spacer pot)
+            (above (beside pot pot pot)
                    (solid-rectangle (* s aspect-ratio) (* s 0.01) (c 12)))]
            [background
             (overlay/align "middle" "bottom" pots wall-with-window)])
