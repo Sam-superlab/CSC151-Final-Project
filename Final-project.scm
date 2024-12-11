@@ -38,7 +38,7 @@
 ;; (description "code stored in generate-background.scm")
 
 ;; (title "Scene creation")
-(part "Background")
+;; (part "Background")
 
 ;;; Initial definitions to establish the size of the outputted scene.
 ;;; If everything is done properly, changing these will appropriately
@@ -172,7 +172,7 @@
 ;; Uncomment to view:
 ; (generate-background 200)
 
-(part "Point manipulation utilities")
+;; (part "Point manipulation utilities")
 
 ;;; The center of a plane
 (define origin (pair 0 0))
@@ -321,7 +321,7 @@
            [-s (* -1 s)])
           (genlt p c -s s c))))
 
-(part "Core drawing procedures")
+;; (part "Core drawing procedures")
 
 ;;; (spiral pts det theta w h color1 color2) -> drawing?
 ;;;    pts : (list-of pair?)
@@ -424,7 +424,7 @@
             (solid-rectangle cw ch (rgb 0 0 0 0))
             badpts))))
 
-(part "Tree procedures")
+;; (part "Tree procedures")
 
 ;;; Struct definitions for handling tree structures
 ;;; (in the very literal sense of making visual art of trees)
@@ -706,13 +706,13 @@
         (section map (section shift-pt _ 0 (* 0.5 ch)) _)
         (section path cw ch _ "solid" color))))
 
-(part "Individual plants")
+;; (part "Individual plants")
 
-(problem "Plants which are more or less polished:")
-(description "(could potentially add bonus features and details,
-and may still need to optimize for interactivity or animation)")
+;; (problem "Plants which are more or less polished:")
+;; (description "(could potentially add bonus features and details,
+;; and may still need to optimize for interactivity or animation)")
 
-(description "Sunflower")
+;; (description "Sunflower")
 
 ;;; (sunflower-outer-petals size color1 color2) -> drawing?
 ;;;    size : nonnegative-number?
@@ -822,9 +822,9 @@ and may still need to optimize for interactivity or animation)")
 ; (sunflower 50 "purple" "yellow" "pink" "green" "cyan" "black")
 
 ;; default sunflower
-(sunflower 80 "orange" "yellow" "darkgreen" "green" "brown" "black")
+;; (sunflower 80 "orange" "yellow" "darkgreen" "green" "brown" "black")
 
-(description "Fern")
+;; (description "Fern")
 
 ;;; (fern size color) -> drawing?
 ;;;    size : nonnegative-integer?
@@ -837,9 +837,9 @@ and may still need to optimize for interactivity or animation)")
     (|> (tree-pts size 9 0.5 0.65 0.55 0.15 -1.5 #t)
         (section draw-trunk _ color (* 2 size) (* 2 size) 5))))
 
-(fern 200 "green")
+;; (fern 200 "green")
 
-(description "Sakura")
+;; (description "Sakura")
 
 ;;; (sakura size c1 c2) -> drawing?
 ;;;    size : nonnegative-integer?
@@ -861,9 +861,9 @@ and may still need to optimize for interactivity or animation)")
             leaves 
             trunk))))
 
-(sakura 300 "violet" "brown")
+;; (sakura 300 "violet" "brown")
 
-(description "Hydrangea")
+;; (description "Hydrangea")
 
 ;;; (define baby-hydrangea size color) -> drawing?
 ;;;    size : nonnegative-integer?
@@ -924,12 +924,12 @@ and may still need to optimize for interactivity or animation)")
                         "outline" c3)])
           (overlay flowers stems))))
 
-(hydrangea 60 "blue" "violet" "green")
+;; (hydrangea 60 "blue" "violet" "green")
 
-(problem "Plants where a basic version exists already:")
-(description "(may need refinement to style or functionality)")
+;; (problem "Plants where a basic version exists already:")
+;; (description "(may need refinement to style or functionality)")
 
-(description "Pumpkin")
+;; (description "Pumpkin")
 
 (define number-of-loops 5)
 (define box-size 400)
@@ -977,7 +977,7 @@ and may still need to optimize for interactivity or animation)")
 ;       reverse
 ;       (section apply overlay _)))
 
-(description "Water lily")
+;; (description "Water lily")
 
 (define water-lily
   (lambda (size color)
@@ -1002,7 +1002,7 @@ and may still need to optimize for interactivity or animation)")
 
 ; (water-lily 10 (rgb 255 0 255 50))
 
-(description "Bamboo")
+;; (description "Bamboo")
 
 (define echo-pts-shallow
   (lambda (p1 p2 d)
@@ -1114,18 +1114,18 @@ and may still need to optimize for interactivity or animation)")
 
 ; (rotate 0 stem)
 
-(problem "Plants which could realistically be added")
-(description "(should be simple variations of existing plants,
-requiring minimal tinkering)")
+;; (problem "Plants which could realistically be added")
+;; (description "(should be simple variations of existing plants,
+;; requiring minimal tinkering)")
 
-(description "Daisy")
+;; (description "Daisy")
 ; should be very similar to sunflower
 
-(description "Rose")
+;; (description "Rose")
 ; some ideas, but not sure of the best way. 
 
 
-(description "code stored in interactive-plant.scm")
+;; (description "code stored in interactive-plant.scm")
 
 ;;; (my-canvas-drawing! canvas x y drawing) -> void?
 ;;;    canvas : canvas?
